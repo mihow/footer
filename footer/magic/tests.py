@@ -13,7 +13,6 @@ class ImageTests(TestCase):
         from .images import make_svg
         context = {'name': 'test'}
         svg = make_svg(context)
-        self.assertTrue( svg.startswith('<?xml') )
         self.assertTrue( svg.endswith('</svg>') )
         for v in context.values():
             self.assertIn(v, svg)

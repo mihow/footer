@@ -10,6 +10,7 @@ from django.template import Template, Context
 from django.views.decorators.cache import never_cache
 
 from PIL import Image, ImageDraw
+from footer.magic import images
 
 
 
@@ -33,6 +34,10 @@ class FooterView(View):
         img = self.as_image()
         resp = HttpResponse(content_type='image/jpg')
         img.save(resp, 'JPEG')
+
+        resp = HttpResponse(content_type='image/png')
+        svg = images.make_svg(self.request_data())
+        images.write_svg_to_png(svg, resp)
         
         return resp
 
