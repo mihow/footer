@@ -61,6 +61,7 @@ LOCAL_APPS = (
     # custom users app
     'footer.users.apps.UsersConfig',
     # Your stuff: custom apps go here
+    'footer.magic',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
