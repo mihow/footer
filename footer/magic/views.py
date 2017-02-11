@@ -10,6 +10,7 @@ from django.template import Template, Context
 from django.views.decorators.cache import never_cache
 
 from PIL import Image, ImageDraw
+import yahoo_finance
 from footer.magic import images
 
 
@@ -25,21 +26,33 @@ class FooterView(View):
     @never_cache # Sets headers for client as well
     def get(self, request):
 
-        resp = HttpResponse(self.as_html())
-        resp = JsonResponse(
-                self.request_data(), 
-                #safe=False,
-                encoder=JSONEncoder)
+        # resp = HttpResponse(self.as_html())
+        # resp = JsonResponse(
+        #         self.request_data(), 
+        #         #safe=False,
+        #         encoder=JSONEncoder)
 
-        img = self.as_image()
-        resp = HttpResponse(content_type='image/jpg')
-        img.save(resp, 'JPEG')
+        # img = self.as_image()
+        # resp = HttpResponse(content_type='image/jpg')
+        # img.save(resp, 'JPEG')
 
         resp = HttpResponse(content_type='image/png')
         svg = images.make_svg(self.request_data())
         images.write_svg_to_png(svg, resp)
         
         return resp
+
+    def stock_price(self):
+        goog = yahoo_finance.Share('GOOG')
+        price = goog.get_price()
+        date = goog.get_trade_datetime()
+        return price, date
+
+    def num_views(self):
+        return 0
+
+    def locations(self):
+        return ','.join([])
 
     def cache_buster(self):
         return random.randint(00000000000, 999999999999)
@@ -71,6 +84,9 @@ class FooterView(View):
         ]
         summary = {}
         summary['TIMESTAMP'] = dt.datetime.now()
+        price, date = self.stock_price()
+        summary['GOOG_STOCK_PRICE'] = price
+        summary['GOOG_STOCK_PRICE_DATE'] = date 
 
         if hasattr(data, 'items'):
             for k,v, in data.items():

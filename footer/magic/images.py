@@ -7,7 +7,7 @@ from django.template import Template, Context
 def make_svg(context):
     svg_tmpl = Template("""
     <svg xmlns="http://www.w3.org/2000/svg"
-      width="500" height="400" viewBox="0 0 500 400">
+      width="500" height="600" viewBox="0 0 500 400">
 
       <text x="0" y="0" font-family="Verdana" font-size="10" fill="blue" dy="0">
         {{ name }} {{ text }}
