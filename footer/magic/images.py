@@ -19,12 +19,12 @@ def make_svg(context):
                 </tspan>
                 {% for kk, vv in v.items %}
 	            <tspan x="0" dy="1.0em">
-                        {{ kk }}: {{ vv }}
+                        {{ kk }}: <tspan fill="red" dy="0.0em">{{ vv }}</tspan>
                     </tspan>
                 {% endfor %} 
 	    {% else %} 
 	        <tspan x="0" dy="1.0em">
-                    {{ k }}: {{ v }}
+                    {{ k }}: <tspan fill="red" dy="0.0em">{{ v }}</tspan>
                 </tspan>
             {% endif %}
         {% endfor %} 
