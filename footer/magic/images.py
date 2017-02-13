@@ -12,7 +12,7 @@ def make_svg(context):
       <text x="0" y="0" font-family="Verdana" font-size="10" fill="blue" dy="0">
         {{ name }} {{ text }}
 
-        {% for k,v in data.items %}
+        {% for k,v in data %}
             {% if v.items %}
 	        <tspan x="0" dy="1.0em">
                     {{ k }}:
@@ -32,7 +32,7 @@ def make_svg(context):
     </svg>
     """.strip())
 
-    svg = svg_tmpl.render(Context({'data': context}))
+    svg = svg_tmpl.render(Context({'data': sorted(context.iteritems())}))
 
     return svg
 
