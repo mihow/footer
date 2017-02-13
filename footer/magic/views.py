@@ -148,7 +148,7 @@ class SendEmailView(View):
         body = body.encode('utf8')
         from_email = 'footer@bunsen.town'
 
-        if not settings.DEBUG:
+        if settings.DEBUG:
             from django.core.mail import send_mail
 
             result = send_mail(
