@@ -23,8 +23,9 @@ urlpatterns = [
     url(r'^accounts/', include('allauth.urls')),
 
     # Your stuff: custom urls includes go here
-    url(r'^redirect.jpg$', RedirectView.as_view(url='/image.jpg'), name='image_redirect'),
-    url(r'^image.jpg$', FooterView.as_view(), name='test'),
+    url(r'^redirect.png', RedirectView.as_view(url='/image.png'), name='image_redirect'),
+    #url(r'^image(?P<uuid>\w+)?.jpg$', FooterView.as_view(), name='test_image'),
+    url(r'^image.png', FooterView.as_view(), name='test_image'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
