@@ -1,6 +1,7 @@
 from __future__ import print_function
+
 import tempfile
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 
 
 import cairosvg
@@ -30,3 +31,16 @@ class ImageTests(TestCase):
         # Check if file is binary
         file_content = open(fname, 'rb').read()
         self.assertIn(b'\x00', file_content)
+
+
+class VisitorDataTests(TestCase):
+
+    def setUp(self):
+        from .views import FooterView
+        self.factory = RequestFactory()
+        self.view = FooterView()
+
+    def test_location(self):
+        request = self.factory.get('/', REMOTE_ADDR='65.121.85.202')
+        location = self.view.get_location(request)
+        self.assertIn("Beaverton", location.city.name)

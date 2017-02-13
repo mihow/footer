@@ -1,3 +1,4 @@
+import os
 import random
 import datetime as dt
 
@@ -6,6 +7,7 @@ from django.views import View
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template import Template, Context
 from django.views.decorators.cache import never_cache
+from django.conf import settings
 
 from footer.magic import images
 import yahoo_finance
@@ -98,25 +100,25 @@ class FooterView(View):
                             
         return data
 
-#    def get_location(self, request):
-#        import geoip2.database
-#        from geoip2.errors import AddressNotFoundError
-#        # @TODO make more robust method of finding user's real IP
-#        # https://github.com/mihow/django-ipware
-#        # ip_address = get_client_ip(request)
-#        ip_address = request.META['REMOTE_ADDR']
-#        dbpath = os.environ['GEOIP_DATABASE_PATH']
-#        lookup = geoip2.database.Reader(dbpath)
-#        try:
-#            resp = lookup.city(ip_address)
-#            # location_name = resp.most_specific.name
-#            # print(location_name)
-#            lookup.close()
-#            return resp 
-#        except AddressNotFoundError:
-#            return None
-#
-#    # @app.route('/request_data.html')
+    def get_location(self, request):
+        import geoip2.database
+        from geoip2.errors import AddressNotFoundError
+        # @TODO make more robust method of finding user's real IP
+        # https://github.com/mihow/django-ipware
+        # ip_address = get_client_ip(request)
+        ip_address = request.META['REMOTE_ADDR']
+        dbpath = settings.GEOIP_DATABASE_PATH 
+        lookup = geoip2.database.Reader(dbpath)
+        try:
+            resp = lookup.city(ip_address)
+            # location_name = resp.most_specific.name
+            # print(location_name)
+            lookup.close()
+            return resp 
+        except AddressNotFoundError:
+            return None
+
+    # @app.route('/request_data.html')
     def as_html(self):
         data = self.request_data()
         tmpl = Template("""

@@ -278,3 +278,5 @@ ADMIN_URL = r'^admin/'
 
 # Your common stuff: Below this line define 3rd party library settings
 # ------------------------------------------------------------------------------
+
+GEOIP_DATABASE_PATH = env('GEOIP_DATABASE_PATH', default=(str(ROOT_DIR.path('GeoLite2-City.mmdb'))))
