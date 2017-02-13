@@ -36,6 +36,9 @@ class InlineTextImage(View):
 
         resp = HttpResponse(content_type='image/png')
 	# text = self.kwargs.get('text', '?')
+        # BIG @TODO these need to be LIVE variables from the request
+        # not old text from previous request in browser
+	param = request.GET.get('param')
 	text = request.GET.get('text', '?')
         svg = images.inline_text_image(text, resp)
         
