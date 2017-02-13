@@ -13,6 +13,7 @@ import pytz
 
 from footer.magic import images
 import yahoo_finance
+from ipware.ip import get_ip, get_real_ip
 
 
 
@@ -129,9 +130,11 @@ class FooterView(View):
         # https://github.com/mihow/django-ipware
 
         # Test IP for local dev
+        # ip_address = test_ip or self.request.META['REMOTE_ADDR']
         test_ip = settings.TEST_REMOTE_IP
-        ip_address = test_ip or self.request.META['REMOTE_ADDR']
-        # ip_address = get_client_ip(request)
+        real_ip = get_real_ip(self.request)
+        best_ip = get_ip(self.request)
+        ip_address = real_ip or best_ip or test_ip
 
         dbpath = settings.GEOIP_DATABASE_PATH 
         lookup = geoip2.database.Reader(dbpath)
