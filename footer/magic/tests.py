@@ -3,10 +3,21 @@ from __future__ import print_function
 import tempfile
 from django.test import TestCase, RequestFactory
 
-
 import cairosvg
 
-# Create your tests here.
+
+
+def setup_view(ViewClass, request, *args, **kwargs):
+    """Mimic ``as_view()``, but returns view instance.
+    Use this function to get view instances on which you can run unit tests,
+    by testing specific methods."""
+
+    view_instance = ViewClass()
+    view_instance.request = request
+    view_instance.args = args
+    view_instance.kwargs = kwargs
+    return view_instance
+
 
 class ImageTests(TestCase):
 
@@ -37,10 +48,11 @@ class VisitorDataTests(TestCase):
 
     def setUp(self):
         from .views import FooterView
-        self.factory = RequestFactory()
-        self.view = FooterView()
+        self.client = RequestFactory()
+        self.request = self.client.get('/', REMOTE_ADDR='65.121.85.202')
+        self.view = setup_view(FooterView, self.request)
+        # self.response = FooterView.as_view()(request)
 
     def test_location(self):
-        request = self.factory.get('/', REMOTE_ADDR='65.121.85.202')
-        location = self.view.get_location(request)
+        location = self.view.get_location()
         self.assertIn("Beaverton", location.city.name)
