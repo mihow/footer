@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Footer Test v0.2</title>
+    </head>
+    <body style="
+    font-family:monospace; 
+    font-size: medium;
+    width: 40em;
+    border: 1px solid blue;
+    padding: 2%;
+    margin: 4% auto;">
+
+        <h2>Select the image below and paste in your email body:</h2>
+        <p>&nbsp;</p>
+        <div style="text-align:center; background: #eee; width: 80%; margin: 0 auto;">
+            <p>[-- text before image --]<br><br></p>
+            <p>
+            <img src="{{ url_for_location_image_external_True_request_id_buster1 }}" 
+                 title="Request data as image"
+                 alt="This should be an image with HTTP headers, etc">
+            </p>
+            <p><br>[-- text after image --]</p>
+        </div>
+        <p>&nbsp;</p>
+
+        <h2>Send a test email:</h2>
+        <form action="/email" method="POST">
+            <p>
+            <input 
+                              name="email"
+                              type="text" 
+                              placeholder="youremail@example.org"
+                              style="width:95%" />
+            </p>
+            <p>
+            <input type="submit" value="Send!"> 
+            </p>
+            <p>&nbsp;</p>
+
+            <h2>Or here is html for the image tag you can use:</h2>
+            <p>
+            <input 
+                                 type="text" 
+_                                value='<img src="{{ url }}">' 
+                                             style="width:95%" />
+            </p>
+
+            <h2>Links</h2>
+            <ul>
+                <li><a href="{{ test }}">
+                        Show request data as HTML</a></li>
+                <li><a href="{{ test }}">
+                        Show request data as JSON</a></li>
+                <li><a href="{{ test }}">
+                        Show locaton data as JSON</a></li>
+            </ul>
+    </body>
+</html>

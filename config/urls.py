@@ -11,8 +11,7 @@ from django.views import defaults as default_views
 from footer.magic.views import FooterView
 
 urlpatterns = [
-    #url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name='home'),
-    url(r'^$', RedirectView.as_view(url='/image.jpg'), name='home'),
+    url(r'^$', TemplateView.as_view(template_name='index.html'), name='home'),
 
     url(r'^about/$', TemplateView.as_view(template_name='pages/about.html'), name='about'),
 
