@@ -8,6 +8,7 @@ from django.contrib import admin
 from django.views.generic import TemplateView, RedirectView
 from django.views import defaults as default_views
 from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_exempt # @TODO needed?
 
 from footer.magic.views import TestImageView, InlineTextImage, IndexView, SendEmailView
 
@@ -28,7 +29,7 @@ urlpatterns = [
     #url(r'^image(?P<uuid>\w+)?.jpg$', FooterView.as_view(), name='test_image'),
     url(r'^image.png', never_cache(TestImageView.as_view()), name='test_image'),
     url(r'^text.png', never_cache(InlineTextImage.as_view()), name='inline_text_image'),
-    url(r'^email', SendEmailView.as_view(), name='send_email'),
+    url(r'^email', csrf_exempt(SendEmailView.as_view()), name='send_email'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
