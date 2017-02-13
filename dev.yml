@@ -30,6 +30,7 @@ services:
     links:
       - postgres
       - mailhog
+    env_file: .env
 
   mailhog:
     image: mailhog/mailhog
