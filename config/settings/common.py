@@ -280,3 +280,4 @@ ADMIN_URL = r'^admin/'
 # ------------------------------------------------------------------------------
 
 GEOIP_DATABASE_PATH = env('GEOIP_DATABASE_PATH', default=(str(ROOT_DIR.path('GeoLite2-City.mmdb'))))
+TEST_REMOTE_IP = env('TEST_REMOTE_IP', default='65.121.85.202') # Beaverton

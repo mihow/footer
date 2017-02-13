@@ -86,6 +86,17 @@ class FooterView(View):
         price, date = self.stock_price()
         summary['GOOG_STOCK_PRICE'] = price
         summary['GOOG_STOCK_PRICE_DATE'] = date 
+        location = self.get_location()
+        if location:
+            summary['LOCATION_CITY'] = location.city.name
+            summary['LOCATION_REGION'] = location.subdivisions.most_specific.name
+            summary['LOCATION_COUNTRY'] = location.country.name
+            summary['LOCATION_TIME_ZONE'] = location.location.time_zone
+            summary['LOCATION_ACCURACY_RADIUS'] = location.location.accuracy_radius
+            non_empty_traits = {k: v for k, v in location.traits.__dict__.items() if v}
+            summary['LOCATION_TRAITS'] = str(non_empty_traits)
+        else:
+            summary['LOCATION'] = 'Unknown'
 
         if hasattr(data, 'items'):
             for k,v, in data.items():
@@ -96,17 +107,22 @@ class FooterView(View):
                 else:
                     if k.upper() in keys_of_interest:
                         summary[k] = data[k]
+
         return summary
                             
         return data
 
-    def get_location(self, request):
+    def get_location(self):
         import geoip2.database
         from geoip2.errors import AddressNotFoundError
         # @TODO make more robust method of finding user's real IP
         # https://github.com/mihow/django-ipware
+
+        # Test IP for local dev
+        test_ip = settings.TEST_REMOTE_IP
+        ip_address = test_ip or self.request.META['REMOTE_ADDR']
         # ip_address = get_client_ip(request)
-        ip_address = request.META['REMOTE_ADDR']
+
         dbpath = settings.GEOIP_DATABASE_PATH 
         lookup = geoip2.database.Reader(dbpath)
         try:
