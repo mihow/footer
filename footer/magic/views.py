@@ -105,7 +105,6 @@ class TestImageView(View):
         return resp
 
     def stock_price(self):
-        return None, None
         try:
             goog = yahoo_finance.Share('GOOG')
         except URLError:

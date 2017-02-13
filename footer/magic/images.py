@@ -70,7 +70,6 @@ def inline_text_image(text, outfile, fontsize=12):
 
     svg = svg_tmpl.render(Context(context))
 
-    print(svg)
     cairosvg.svg2png(bytestring=svg, write_to=outfile)
 
     return outfile
