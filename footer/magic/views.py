@@ -7,12 +7,14 @@ from django.views import View
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template import Template, Context
 from django.views.decorators.cache import never_cache
+from django.views.generic import TemplateView
 from django.conf import settings
 from django.utils import timezone
 import pytz
 
 from footer.magic import images
 import yahoo_finance
+from urllib2 import URLError # @TODO python2 only?
 from ipware.ip import get_ip, get_real_ip
 
 
@@ -23,7 +25,65 @@ class JSONEncoder(DjangoJSONEncoder):
         return str(o)
 
 
-class FooterView(View):
+class InlineTextImage(View):
+
+    @never_cache
+    def get(self, request):
+
+        resp = HttpResponse(content_type='image/png')
+	# text = self.kwargs.get('text', '?')
+	text = request.GET.get('text', '?')
+        svg = images.inline_text_image(text, resp)
+        
+        return resp
+
+
+class FooterView(TemplateView):
+    template_name = 'index.html'
+
+    def location(self):
+        loc = self.get_location()
+        if loc: 
+            return "%s, %s" % (loc.city.name, loc.country.name)
+        else:
+            return "Unknown"
+
+    def ip(self):
+        return self.get_ip()
+
+    def user_agent(self):
+        return self.request.META.get('HTTP_USER_AGENT')
+
+    def get_location(self):
+        import geoip2.database
+        from geoip2.errors import AddressNotFoundError
+
+        ip_address = self.get_ip()
+        dbpath = settings.GEOIP_DATABASE_PATH 
+        lookup = geoip2.database.Reader(dbpath)
+        try:
+            resp = lookup.city(ip_address)
+            lookup.close()
+            return resp 
+        except AddressNotFoundError:
+            return None
+
+    def get_ip(self):
+        real_ip = get_real_ip(self.request)
+        if real_ip is not None:
+            return real_ip
+
+        # best_ip = get_ip(self.request)
+        # if best_ip is not None:
+        #     return best_ip
+
+        test_ip = settings.TEST_REMOTE_IP
+        if test_ip is not None:
+            return test_ip
+
+
+
+class TestImageView(View):
 
     @never_cache # Sets headers for client as well
     def get(self, request):
@@ -45,9 +105,14 @@ class FooterView(View):
         return resp
 
     def stock_price(self):
-        goog = yahoo_finance.Share('GOOG')
-        price = goog.get_price()
-        date = goog.get_trade_datetime()
+        return None, None
+        try:
+            goog = yahoo_finance.Share('GOOG')
+        except URLError:
+            price, date = None, None
+        else:
+            price = goog.get_price()
+            date = goog.get_trade_datetime()
         return price, date
 
     def num_views(self):

@@ -47,11 +47,11 @@ class ImageTests(TestCase):
 class VisitorDataTests(TestCase):
 
     def setUp(self):
-        from .views import FooterView
+        from .views import TestImageView
         self.client = RequestFactory()
         self.request = self.client.get('/', REMOTE_ADDR='65.121.85.202')
-        self.view = setup_view(FooterView, self.request)
-        # self.response = FooterView.as_view()(request)
+        self.view = setup_view(TestImageView, self.request)
+        # self.response = TestImageView.as_view()(request)
 
     def test_location(self):
         location = self.view.get_location()

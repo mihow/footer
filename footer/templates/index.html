@@ -11,7 +11,12 @@
         padding: 2%;
         margin: 4% auto;">
 
-       <h2>Send a test email:</h2>
+       <h2 style="margin-top: 0.1em">Email preview</h2>
+       {% include 'email.html' %}
+
+       <p><br><hr><br></p>
+
+       <h2>Send a test email</h2>
        <form action="/email" method="POST">
            <p>
            <input name="email"
@@ -24,9 +29,9 @@
            </p>
        </form>
 
-       <p>&nbsp;</p>
+       <p><br><hr><br></p>
 
-       <h2>Image preview:</h2>
+       <h2>Image preview</h2>
 
        <div style="text-align:center; background: #eee; width: 100%; margin: 0 auto;">
            <p>[-- text before image --]<br><br></p>
@@ -38,13 +43,21 @@
            <p><br>[-- text after image --]</p>
        </div>
 
-       <p>&nbsp;</p>
+       <p><br><hr><br></p>
 
-       <h2>Embed code:</h2>
+       <h2>Embed code</h2>
        <p>
        <input type="text" 
               value='<img src="http://footer.bunsen.town{% url 'test_image' %}?id={{ uuid }}">' 
               style="width:95%" />
+       </p>
+
+       <p><br><hr><br></p>
+
+       <h2>Link to raw image</h2>
+       <p>
+           <a href="{% url 'test_image' %}?id={{ uuid }}" target="_blank">
+               {% url 'test_image' %}?id={{ uuid }}</a>
        </p>
 
     </body>

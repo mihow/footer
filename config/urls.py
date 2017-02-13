@@ -8,10 +8,10 @@ from django.contrib import admin
 from django.views.generic import TemplateView, RedirectView
 from django.views import defaults as default_views
 
-from footer.magic.views import FooterView
+from footer.magic.views import TestImageView, InlineTextImage, FooterView
 
 urlpatterns = [
-    url(r'^$', TemplateView.as_view(template_name='index.html'), name='home'),
+    url(r'^$', FooterView.as_view(), name='home'),
 
     url(r'^about/$', TemplateView.as_view(template_name='pages/about.html'), name='about'),
 
@@ -25,7 +25,8 @@ urlpatterns = [
     # Your stuff: custom urls includes go here
     url(r'^redirect.png', RedirectView.as_view(url='/image.png'), name='image_redirect'),
     #url(r'^image(?P<uuid>\w+)?.jpg$', FooterView.as_view(), name='test_image'),
-    url(r'^image.png', FooterView.as_view(), name='test_image'),
+    url(r'^image.png', TestImageView.as_view(), name='test_image'),
+    url(r'^text.png', InlineTextImage.as_view(), name='inline_text_image'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
