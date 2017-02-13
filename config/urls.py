@@ -7,11 +7,12 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView, RedirectView
 from django.views import defaults as default_views
+from django.views.decorators.cache import never_cache
 
-from footer.magic.views import TestImageView, InlineTextImage, FooterView
+from footer.magic.views import TestImageView, InlineTextImage, IndexView, SendEmailView
 
 urlpatterns = [
-    url(r'^$', FooterView.as_view(), name='home'),
+    url(r'^$', IndexView.as_view(), name='home'),
 
     url(r'^about/$', TemplateView.as_view(template_name='pages/about.html'), name='about'),
 
@@ -25,8 +26,9 @@ urlpatterns = [
     # Your stuff: custom urls includes go here
     url(r'^redirect.png', RedirectView.as_view(url='/image.png'), name='image_redirect'),
     #url(r'^image(?P<uuid>\w+)?.jpg$', FooterView.as_view(), name='test_image'),
-    url(r'^image.png', TestImageView.as_view(), name='test_image'),
-    url(r'^text.png', InlineTextImage.as_view(), name='inline_text_image'),
+    url(r'^image.png', never_cache(TestImageView.as_view()), name='test_image'),
+    url(r'^text.png', never_cache(InlineTextImage.as_view()), name='inline_text_image'),
+    url(r'^email', SendEmailView.as_view(), name='send_email'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

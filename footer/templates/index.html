@@ -17,8 +17,9 @@
        <p><br><hr><br></p>
 
        <h2>Send a test email</h2>
-       <form action="/email" method="POST">
+       <form action="{% url 'send_email' %}" method="POST">
            <p>
+           {% csrf_token %}
            <input name="email"
                   type="text" 
                   placeholder="youremail@example.org"

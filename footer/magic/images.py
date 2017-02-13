@@ -46,6 +46,8 @@ def write_svg_to_png(svg_raw, outfile):
 
 def inline_text_image(text, outfile, fontsize=12):
 
+    text = text or "?"
+
     width = int((len(text) * fontsize) * 0.60)
     height = int((1 * fontsize) * 1.1)
     text = text.upper()

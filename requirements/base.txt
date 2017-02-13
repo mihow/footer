@@ -47,3 +47,4 @@ celery==3.1.24
 yahoo-finance==1.4.0
 geoip2==2.4.2
 django-ipware==1.1.6
+boto3==1.4.4

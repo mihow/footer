@@ -16,6 +16,7 @@ from footer.magic import images
 import yahoo_finance
 from urllib2 import URLError # @TODO python2 only?
 from ipware.ip import get_ip, get_real_ip
+import boto3
 
 
 
@@ -23,6 +24,9 @@ from ipware.ip import get_ip, get_real_ip
 class JSONEncoder(DjangoJSONEncoder):
     def default(self, o):
         return str(o)
+
+def random_num():
+    return random.randint(00000000000, 999999999999)
 
 
 class InlineTextImage(View):
@@ -39,7 +43,7 @@ class InlineTextImage(View):
 
 
 class FooterView(TemplateView):
-    template_name = 'index.html'
+    template_name = 'email.html'
 
     def location(self):
         loc = self.get_location()
@@ -81,6 +85,114 @@ class FooterView(TemplateView):
         if test_ip is not None:
             return test_ip
 
+    def ga_image_url(self):
+        if settings.DEBUG:
+            base_url = 'https://www.google-analytics.com/debug/collect?v=1'
+        else:
+            base_url = 'https://www.google-analytics.com/collect?v=1'
+
+        request_id = random_num() # @TODO
+        user_id = self.request.session.session_key
+
+        url = ('{base_url}'
+               '&tid={ga_id}'
+               '&uid={user_id}'
+               '&cid={request_id}'
+               '&t=event&ec=email&ea=open'
+               '&dp=/email/{request_id}'
+               ''.format(
+                  base_url=base_url,
+                  ga_id=settings.GOOGLE_ANALYTICS_ID,
+                  request_id=request_id,
+                  user_id=user_id)
+              )
+
+        return url
+
+    # Allow POSTs so we can use this request inside SendEmailView
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data()
+        return super(FooterView, self).render_to_response(context)
+
+
+
+class IndexView(FooterView):
+    template_name = 'index.html'
+
+
+class SendEmailView(View):
+
+    def post(self, request):
+        to_email = request.POST['email']
+        footer_resp = FooterView.as_view()(request)
+	footer_resp.render()
+        request_id = random_num() #@TODO
+
+        body_tmpl = Template("""
+        Hello! Your footer is below: <br><br>
+
+        -Footer <br><br>
+        
+        ====== <br<br>
+        
+        {% autoescape off %}
+        {{ footer }}
+        {% endautoescape %}
+        """)
+
+        body = body_tmpl.render(Context({
+            'footer': footer_resp.content,
+            }))
+
+        subject = 'Footer project test #{}'.format(request_id)
+        body = body.encode('utf8')
+        from_email = 'footer@bunsen.town'
+
+        if not settings.DEBUG:
+            from django.core.mail import send_mail
+
+            result = send_mail(
+                subject,
+                body,
+                from_email,
+                [to_email],
+                html_message=body)
+
+            if result:
+                status_code = 200
+
+
+        else:
+            ses = boto3.client('ses')
+            result = ses.send_email(
+            Source=from_email,
+                Destination={
+                'ToAddresses': [
+                    to_email,
+                ],
+                },
+                Message={
+                'Subject': {
+                    'Data': subject,
+                },
+                'Body': {
+                    #'Text': {
+                    #    'Data': 'string',
+                    #    'Charset': 'string'
+                    #},
+                    'Html': {
+                    'Data': body,
+                    }
+                }
+                },
+            )
+             
+            status_code = result.get('ResponseMetadata').get('HTTPStatusCode')
+
+        if str(status_code).startswith('2'):
+            return HttpResponse("Success!", status=status_code)
+        else:
+            return HttpResponse("Something went wrong :(", status=status_code)
 
 
 class TestImageView(View):
@@ -243,86 +355,4 @@ class TestImageView(View):
         return JsonResponse(data)
 
 #
-#    def ga_image_url(self, request_id, user_id, debug=True):
-#        if debug:
-#            base_url = 'https://www.google-analytics.com/debug/collect?v=1'
-#        else:
-#            base_url = 'https://www.google-analytics.com/collect?v=1'
 #
-#        url = ('{base_url}'
-#               '&tid={ga_id}'
-#               '&uid={user_id}'
-#               '&cid={request_id}'
-#               '&t=event&ec=email&ea=open'
-#               '&dp=/email/{request_id}'
-#               ''.format(
-#                  base_url=base_url,
-#                  ga_id=os.environ.get('GOOGLE_ANALYTICS_ID'),
-#                  request_id=request_id,
-#                  user_id=user_id)
-#              )
-#
-#        return url
-#
-#    # @app.route('/email', methods=['POST'])
-#    def send_email(self):
-#        email = request.form['email']
-#        body_tmpl = """
-#        Hello! Your image is below: <br><br>
-#
-#        {% autoescape false %}
-#        <img src="{{ footer_img_url }}" 
-#          alt="Image with your location, etc should be here."><br><br>
-#        {% endautoescape %}
-#
-#        -Footer <br><br>
-#
-#        {% autoescape false %}
-#        <img src="{{ google_image_url }}">
-#        {% endautoescape %}
-#        """
-#
-#        request_id = cache_buster()
-#        user_id = md5.md5(email).hexdigest()
-#
-#        debug=os.environ.get('FLASK_DEBUG', False)
-#        body = render_template_string(
-#                body_tmpl, 
-#                footer_img_url=url_for('location_image', 
-#                                       request_id=request_id,
-#                                       _external=True),
-#                google_image_url=ga_image_url(
-#                    request_id, 
-#                    user_id,
-#                    debug=debug))
-#
-#        body = body.encode('utf8')
-#
-#        result = ses.send_email(
-#        Source='footer@bunsen.town',
-#            Destination={
-#            'ToAddresses': [
-#                email,
-#            ],
-#            },
-#            Message={
-#            'Subject': {
-#                'Data': 'Footer project test #{}'.format(cache_buster()),
-#            },
-#            'Body': {
-#                #'Text': {
-#                #    'Data': 'string',
-#                #    'Charset': 'string'
-#                #},
-#                'Html': {
-#                'Data': body,
-#                }
-#            }
-#            },
-#        )
-#         
-#        status_code = result.get('ResponseMetadata').get('HTTPStatusCode')
-#        if str(status_code).startswith('2'):
-#            return "Success!" 
-#        else:
-#            return "Something went wrong :("
