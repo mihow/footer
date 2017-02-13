@@ -8,6 +8,8 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.template import Template, Context
 from django.views.decorators.cache import never_cache
 from django.conf import settings
+from django.utils import timezone
+import pytz
 
 from footer.magic import images
 import yahoo_finance
@@ -81,8 +83,10 @@ class FooterView(View):
             "HTTP_COOKIE",
 
         ]
+
         summary = {}
-        summary['TIMESTAMP'] = dt.datetime.now()
+
+        summary['TIMESTAMP_UTC'] = dt.datetime.utcnow()
         price, date = self.stock_price()
         summary['GOOG_STOCK_PRICE'] = price
         summary['GOOG_STOCK_PRICE_DATE'] = date 
@@ -95,8 +99,14 @@ class FooterView(View):
             summary['LOCATION_ACCURACY_RADIUS'] = location.location.accuracy_radius
             non_empty_traits = {k: v for k, v in location.traits.__dict__.items() if v}
             summary['LOCATION_TRAITS'] = str(non_empty_traits)
+
+            tz = pytz.timezone(location.location.time_zone)
+            timezone.activate(tz)
+            #local_time = timezone.localtime(utc_time, tz)
+            summary['TIMESTAMP_LOCAL'] = timezone.now()
         else:
             summary['LOCATION'] = 'Unknown'
+
 
         if hasattr(data, 'items'):
             for k,v, in data.items():
