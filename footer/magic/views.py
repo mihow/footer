@@ -33,18 +33,19 @@ def random_num():
 
 # class FooterRequestView(View):
 class FooterRequest(View):
+    is_leader = False
 
     def dispatch(self, request, *args, **kwargs):
         # Save request record to database
 
         request_data = dict(request.META)
-        is_leader = True if request.GET.get('leader') else False
+        # is_leader = True if request.GET.get('leader') else False
 
         # Convert non-serializable values to strings:
         request_data_safe = json.loads(json.dumps(request_data, default=str))
         models.FooterRequest.objects.create(
             request_data=request_data_safe,
-            is_leader=is_leader)
+            is_leader=self.is_leader)
 
         return super(FooterRequest, self).dispatch(request, *args, **kwargs)
 
@@ -144,6 +145,30 @@ class InlineTextImage(FooterRequest):
         except AttributeError:
             value = '?'
         svg = images.inline_text_image(value, resp)
+        
+        return resp
+
+
+class LeaderImageView(FooterRequest):
+
+    def __init__(self, *args, **kwargs):
+        self.is_leader = True
+        super(FooterRequest, self).__init__(*args, **kwargs)
+
+    @never_cache
+    def get(self, request):
+
+        resp = HttpResponse(content_type='image/gif')
+        if self.is_leader:
+            if 'start' in request.GET:
+                text = "[LEADER START]"
+            elif 'end' in request.GET:
+                text = "[LEADER END]"
+            else: 
+                text = "[LEADER ORPHAN!]"
+        else:
+            text = "[LEADER FAILED!]"
+        svg = images.inline_text_image(text, resp)
         
         return resp
 

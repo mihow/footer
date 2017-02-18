@@ -10,7 +10,9 @@ from .models import FooterRequest
 
 
 class FooterRequestAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'is_leader_start', 'is_leader_end', 'created', 'user_agent')
     readonly_fields = ('is_leader', 'data_formatted', 'created')
+    filter_fields = ('is_leader', 'created')
 
     def data_formatted(self, instance):
         """Function to display pretty version of our data"""

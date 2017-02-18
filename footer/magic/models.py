@@ -46,13 +46,47 @@ class FooterRequest(models.Model):
         if self.footer:
             return "Footer #%s" % self.footer.uuid
         else:
-            return "Anonymous Footer"
+            return "Footer ?"
 
     def __str__(self):
-        return "%sRequest id %s for %s" % (
-            "Leader " if self.is_leader else "",
+        return "Request #%s for %s%s" % (
             self.id, 
-            self.footer_name())
+            self.footer_name(),
+            " - LEADER" if self.is_leader else "",)
+
+    def lookup(self, key):
+        """
+        Fetch a variable from the request data JSON
+        which can look very different depending on the
+        original HTTP request.
+        """
+        key = str(key)
+        if self.request_data:
+            if key in self.request_data:
+                return self.request_data[key]
+            elif key.lower() in self.request_data: 
+                return self.request_data[key.lower()]
+            else:
+                return None
+        else:
+            return None
+
+    def is_leader_start(self):
+        if 'start' in self.lookup('QUERY_STRING'):
+            return True
+        else:
+            return False
+    is_leader_start.boolean = True
+
+    def is_leader_end(self):
+        if 'end' in self.lookup('QUERY_STRING'):
+            return True
+        else:
+            return False
+    is_leader_end.boolean = True
+
+    def user_agent(self):
+        return self.lookup('HTTP_USER_AGENT') or self.lookup('USER_AGENT')
 
     class Meta:
         ordering = ['-created']
