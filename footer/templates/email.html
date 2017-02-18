@@ -1,6 +1,6 @@
 {% load footer_magic %}
 
-<img src="{% url 'leader_image' %}?start" /><br>
+{% leader 'start' %}
 
 <p>It's my understanding that you are reading this communication. It is also my understanding that this message has been opened {% ii 'num_times' %}  times thus far, not necessarily by you.</p>
 
@@ -21,5 +21,5 @@ ETC.<br>
 <p>The time now is {% ii 'timestamp' %}</p>
 
 
-<img src="{% url 'leader_image' %}?end" /><br>
+{% leader 'end' %}
 <img src="{{ view.ga_image_url }}" />

@@ -16,3 +16,12 @@ def inline_image(context, text):
     src = '%s?param=%s&id=%s' % (src, text, uuid)
     tag = '<img src="%s" alt="%s" title="%s">' % (src, text, text)
     return mark_safe(tag)
+
+@register.simple_tag(takes_context=True, name='leader')
+def leader_image(context, position):
+    uuid = context.get('uuid', 'id')
+    request = context['request']
+    position = position or 'orphan'
+    src = request.build_absolute_uri(reverse('leader_image'))
+    tag = '<img src="%s?%s" alt="%s" title="%s">' % (src, position, position, position)
+    return mark_safe(tag)
