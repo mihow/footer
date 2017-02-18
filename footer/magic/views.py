@@ -1,11 +1,13 @@
 import os
 import random
 import datetime as dt
+import json
 
 from django.http import HttpResponse, JsonResponse
 from django.views import View
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template import Template, Context
+from django.template.loader import render_to_string
 from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView
 from django.conf import settings
@@ -13,6 +15,7 @@ from django.utils import timezone
 import pytz
 
 from footer.magic import images
+from footer.magic import models
 import yahoo_finance
 from urllib2 import URLError # @TODO python2 only?
 from ipware.ip import get_ip, get_real_ip
@@ -28,25 +31,25 @@ class JSONEncoder(DjangoJSONEncoder):
 def random_num():
     return random.randint(00000000000, 999999999999)
 
+# class FooterRequestView(View):
+class FooterRequest(View):
 
-class InlineTextImage(View):
+    def dispatch(self, request, *args, **kwargs):
+        # Save request record to database
 
-    @never_cache
-    def get(self, request):
+        request_data = dict(request.META)
+        is_leader = True if request.GET.get('leader') else False
 
-        resp = HttpResponse(content_type='image/png')
-	# text = self.kwargs.get('text', '?')
-        # BIG @TODO these need to be LIVE variables from the request
-        # not old text from previous request in browser
-	param = request.GET.get('param')
-	text = request.GET.get('text', '?')
-        svg = images.inline_text_image(text, resp)
-        
-        return resp
+        # Convert non-serializable values to strings:
+        request_data_safe = json.loads(json.dumps(request_data, default=str))
+        models.FooterRequest.objects.create(
+            request_data=request_data_safe,
+            is_leader=is_leader)
 
+        return super(FooterRequest, self).dispatch(request, *args, **kwargs)
 
-class FooterView(TemplateView):
-    template_name = 'email.html'
+    def timestamp(self):
+        return timezone.now() 
 
     def location(self):
         loc = self.get_location()
@@ -112,23 +115,45 @@ class FooterView(TemplateView):
 
         return url
 
-    # Allow POSTs so we can use this request inside SendEmailView
-    def post(self, request, *args, **kwargs):
-        context = self.get_context_data()
-        return super(FooterView, self).render_to_response(context)
+    # # Allow POSTs so we can use this request inside SendEmailView
+    # def post(self, request, *args, **kwargs):
+    #     return super(FooterRequest, self).get(request, *args, **kwargs)
 
 
+class FooterEmailInstance(TemplateView, FooterRequest):
+    template_name = 'email.html'
 
-class IndexView(FooterView):
+
+class IndexView(FooterEmailInstance):
     template_name = 'index.html'
+
+
+class InlineTextImage(FooterRequest):
+
+    @never_cache
+    def get(self, request):
+
+        resp = HttpResponse(content_type='image/png')
+	# text = self.kwargs.get('text', '?')
+        # BIG @TODO these need to be LIVE variables from the request
+        # not old text from previous request in browser
+	param = request.GET.get('param')
+	# text = request.GET.get('text', '?')
+        try:
+            value = getattr(self, param)()
+        except AttributeError:
+            value = '?'
+        svg = images.inline_text_image(value, resp)
+        
+        return resp
 
 
 class SendEmailView(View):
 
     def post(self, request):
         to_email = request.POST['email']
-        footer_resp = FooterView.as_view()(request)
-	footer_resp.render()
+        # footer_resp = FooterRequest.as_view()(request)
+	# footer_resp.render()
         request_id = random_num() #@TODO
 
         body_tmpl = Template("""
@@ -144,7 +169,7 @@ class SendEmailView(View):
         """)
 
         body = body_tmpl.render(Context({
-            'footer': footer_resp.content,
+            'footer': render_to_string('email.html', request=request)
             }))
 
         subject = 'Footer project test #{}'.format(request_id)

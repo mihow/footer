@@ -10,8 +10,9 @@ register = template.Library()
 def inline_image(context, text):
     uuid = context.get('uuid', 'id')
     request = context['request']
+    # view = context['view']
     #text = "%s-%s" % (text, uuid)
     src = request.build_absolute_uri(reverse('inline_text_image'))
-    src = '%s?text=%s&id=%s' % (src, text, uuid)
+    src = '%s?param=%s&id=%s' % (src, text, uuid)
     tag = '<img src="%s" alt="%s" title="%s">' % (src, text, text)
     return mark_safe(tag)

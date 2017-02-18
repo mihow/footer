@@ -35,15 +35,24 @@ class Footer(models.Model):
 
 class FooterRequest(models.Model):
     footer = models.ForeignKey(Footer, null=True, blank=True)
-    request_data = JSONField(null=True, blank=True)
-    image = models.ImageField(null=True, blank=True)
+    request_data = JSONField(null=True, blank=True, editable=False)
+    is_leader = models.BooleanField(default=False, editable=False)
+    image = models.ImageField(null=True, blank=True, editable=False)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
+    def footer_name(self):
+        if self.footer:
+            return "Footer #%s" % self.footer.uuid
+        else:
+            return "Anonymous Footer"
 
     def __str__(self):
-        return "Request id for Footer #%s" % self.id, self.footer.uuid
+        return "%sRequest id %s for %s" % (
+            "Leader " if self.is_leader else "",
+            self.id, 
+            self.footer_name())
 
     class Meta:
         ordering = ['-created']

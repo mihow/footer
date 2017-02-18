@@ -44,9 +44,10 @@ def write_svg_to_png(svg_raw, outfile):
     return outfile
 
 
+#@TODO python2 unicode compatability method
 def inline_text_image(text, outfile, fontsize=12):
 
-    text = text or "?"
+    text = str(text) or "?"
 
     width = int((len(text) * fontsize) * 0.60)
     height = int((1 * fontsize) * 1.1)
