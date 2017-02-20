@@ -77,6 +77,12 @@ class FooterRequest(View):
                 request_data__QUERY_STRING__contains=('start')).filter(
 		created__gte=today_start).count()
 
+    def request_count_now(self):
+        this_minute = self.timestamp().replace(second=0,microsecond=0)
+        return models.FooterRequest.objects.filter(is_leader=True).filter(
+                request_data__QUERY_STRING__contains=('start')).filter(
+		created__gte=this_minute).count()
+
     def location(self):
         # @TODO move all these methods to the model
 	# @TODO make location a model field
