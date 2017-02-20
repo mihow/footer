@@ -34,6 +34,7 @@ def random_num():
 # class FooterRequestView(View):
 class FooterRequest(View):
     is_leader = False
+    _location = None
 
     def dispatch(self, request, *args, **kwargs):
         # Save request record to database
@@ -43,21 +44,50 @@ class FooterRequest(View):
 
         # Convert non-serializable values to strings:
         request_data_safe = json.loads(json.dumps(request_data, default=str))
-        models.FooterRequest.objects.create(
+        self.footer = models.FooterRequest.objects.create(
             request_data=request_data_safe,
             is_leader=self.is_leader)
 
         return super(FooterRequest, self).dispatch(request, *args, **kwargs)
 
     def timestamp(self):
-        return timezone.now() 
+        # @TODO still not working?
+        location = self.get_location()
+	if location:
+	    tz = pytz.timezone(location.location.time_zone)
+	    timezone.activate(tz)
+	dt_now = timezone.now()
+        return dt_now 
+
+    def timezone(self):
+        location = self.get_location()
+	if location:
+	    tz = pytz.timezone(location.location.time_zone)
+	    return tz
+	else:
+	    return "Unknown"
+
+    def request_count(self):
+        return models.FooterRequest.objects.filter(is_leader=True).filter(
+                request_data__QUERY_STRING__contains=('start')).count()
+
+    def request_count_today(self):
+        today_start = self.timestamp().replace(hour=0,minute=0,second=0,microsecond=0)
+        return models.FooterRequest.objects.filter(is_leader=True).filter(
+                request_data__QUERY_STRING__contains=('start')).filter(
+		created__gte=today_start).count()
 
     def location(self):
+        # @TODO move all these methods to the model
+	# @TODO make location a model field
         loc = self.get_location()
         if loc: 
             return "%s, %s" % (loc.city.name, loc.country.name)
         else:
             return "Unknown"
+
+    def sender_location(self):
+	return "99 Gansevoort St, New York, NY 10014, USA"
 
     def ip(self):
         return self.get_ip()
@@ -66,6 +96,9 @@ class FooterRequest(View):
         return self.request.META.get('HTTP_USER_AGENT')
 
     def get_location(self):
+        if self._location:
+	    return self._location
+
         import geoip2.database
         from geoip2.errors import AddressNotFoundError
 
@@ -75,6 +108,7 @@ class FooterRequest(View):
         try:
             resp = lookup.city(ip_address)
             lookup.close()
+	    self._location = resp 
             return resp 
         except AddressNotFoundError:
             return None
@@ -140,10 +174,14 @@ class InlineTextImage(FooterRequest):
         # not old text from previous request in browser
 	param = request.GET.get('param')
 	# text = request.GET.get('text', '?')
-        try:
-            value = getattr(self, param)()
-        except AttributeError:
-            value = '?'
+	if not hasattr(self, param):
+	    value = "Not Implemented"
+	else:
+	    try:
+		value = getattr(self, param)()
+	    except AttributeError as e:
+	        #log.error(e)
+	        value = "Unavailable (%s)" % e
         svg = images.inline_text_image(value, resp)
         
         return resp
