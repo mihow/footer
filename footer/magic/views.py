@@ -114,6 +114,12 @@ class FooterRequest(View):
         else:
             return "Unknown"
 
+    def location_accuracy(self):
+        location = self.get_location()
+	if location:
+            return location.location.accuracy_radius
+        return "Unknown"
+
     def sender_location(self):
 	return "99 Gansevoort St, New York, NY 10014, USA"
 
