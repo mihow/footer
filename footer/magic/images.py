@@ -87,6 +87,9 @@ def inline_text_animation(text_lines, outfile, fontsize=12):
     if not hasattr(text_lines, '__iter__'):
         text_lines = [text_lines]
 
+    if not len(text_lines):
+        return outfile
+
     tempfiles = []
     height = 0
     width = 0

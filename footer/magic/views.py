@@ -44,14 +44,36 @@ class FooterRequest(View):
 
         # Convert non-serializable values to strings:
         request_data_safe = json.loads(json.dumps(request_data, default=str))
-        self.footer = models.FooterRequest.objects.create(
-            request_data=request_data_safe,
-            is_leader=self.is_leader)
+        if self.is_leader:
+            # Do we need to save any other requests?
+            self.footer = models.FooterRequest.objects.create(
+                is_leader=self.is_leader,
+                request_data=request_data_safe,
+                location=self.get_location(serialize=True),
+                user_agent=self.user_agent(),
+                ip_address=self.ip(),
+            )
 
         return super(FooterRequest, self).dispatch(request, *args, **kwargs)
 
+    def _past_requests(self):
+        # @TODO make this a QueryManager method
+        return models.FooterRequest.objects.filter(is_leader=True).filter(
+                request_data__QUERY_STRING__contains=('start'))
+
     def history(self):
-        return ['food', 'magic', 'beans', 'goodnight moon!']
+        requests = self._past_requests().all()
+        ips = []
+        data = []
+        for r in requests:
+            if r.ip_address not in ips:
+                ips.append(r.ip_address)
+                data.append(", ".join([
+                    r.created.strftime('%Y-%m-%d %H:%M%p'), 
+                    r.ip_address,
+                    r.location_str()
+                ]))
+        return data
 
     def timestamp(self):
         # @TODO still not working?
@@ -71,19 +93,16 @@ class FooterRequest(View):
 	    return "Unknown"
 
     def request_count(self):
-        return models.FooterRequest.objects.filter(is_leader=True).filter(
-                request_data__QUERY_STRING__contains=('start')).count()
+        return self._past_requests().count()
 
     def request_count_today(self):
         today_start = self.timestamp().replace(hour=0,minute=0,second=0,microsecond=0)
-        return models.FooterRequest.objects.filter(is_leader=True).filter(
-                request_data__QUERY_STRING__contains=('start')).filter(
+        return self._past_requests().filter(
 		created__gte=today_start).count()
 
     def request_count_now(self):
         this_minute = self.timestamp().replace(second=0,microsecond=0)
-        return models.FooterRequest.objects.filter(is_leader=True).filter(
-                request_data__QUERY_STRING__contains=('start')).filter(
+        return self._past_requests().filter(
 		created__gte=this_minute).count()
 
     def location(self):
@@ -104,7 +123,7 @@ class FooterRequest(View):
     def user_agent(self):
         return self.request.META.get('HTTP_USER_AGENT')
 
-    def get_location(self):
+    def get_location(self, serialize=False):
         if self._location:
 	    return self._location
 
@@ -118,7 +137,17 @@ class FooterRequest(View):
             resp = lookup.city(ip_address)
             lookup.close()
 	    self._location = resp 
-            return resp 
+            if serialize:
+                data = {
+                    'city': resp.city.name,
+                    'location': resp.location.__dict__,
+                    'country': resp.country.name,
+                }
+                # Create JSON safe dict
+                data = json.loads(json.dumps(data, default=str))
+                return data
+            else:
+                return resp 
         except AddressNotFoundError:
             return None
 

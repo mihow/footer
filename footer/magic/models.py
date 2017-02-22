@@ -39,6 +39,10 @@ class FooterRequest(models.Model):
     is_leader = models.BooleanField(default=False, editable=False)
     image = models.ImageField(null=True, blank=True, editable=False)
 
+    location = JSONField(null=True, blank=True, editable=False)
+    user_agent = models.CharField(max_length=1024, null=True, blank=True, editable=False)
+    ip_address = models.GenericIPAddressField(null=True, blank=True, editable=False)
+
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -53,6 +57,15 @@ class FooterRequest(models.Model):
             self.id, 
             self.footer_name(),
             " - LEADER" if self.is_leader else "",)
+
+    def location_str(self):
+        if self.location:
+            if hasattr(self.location, 'items'):
+                city = str(self.location.get('city'))
+                country = str(self.location.get('country'))
+                return ", ".join([c for c in [city, country] if c])
+        return "Unknown"
+
 
     def lookup(self, key):
         """
@@ -85,8 +98,8 @@ class FooterRequest(models.Model):
             return False
     is_leader_end.boolean = True
 
-    def user_agent(self):
-        return self.lookup('HTTP_USER_AGENT') or self.lookup('USER_AGENT')
+    # def user_agent(self):
+    #     return self.lookup('HTTP_USER_AGENT') or self.lookup('USER_AGENT')
 
     class Meta:
         ordering = ['-created']
