@@ -1,8 +1,9 @@
 from __future__ import print_function
 
+import os
 import tempfile
-from django.test import TestCase, RequestFactory
 
+from django.test import TestCase, RequestFactory
 import cairosvg
 
 
@@ -42,6 +43,27 @@ class ImageTests(TestCase):
         # Check if file is binary
         file_content = open(fname, 'rb').read()
         self.assertIn(b'\x00', file_content)
+
+    def test_make_gif(self):
+        from .images import inline_text_image 
+        from io import BytesIO
+        from PIL import Image
+        frames = []
+        for line in ['beans', 'tears', 'moon']:
+            buff = BytesIO()
+            inline_text_image(line, buff)
+            buff.seek(0)
+            img = Image.open(buff)
+            frames.append(img)
+
+        img = frames.pop(0)
+        fname = '/tmp/test.gif'
+        img.save(fname, 
+                 save_all=True, 
+                 append_images=frames,
+                 duration=1000, # One second
+                 loop=5) # Omit to loop infinitly
+        self.assertTrue( os.path.isfile(fname) )
 
 
 class VisitorDataTests(TestCase):
