@@ -17,6 +17,15 @@ def inline_image(context, text):
     tag = '<img src="%s" alt="%s" title="%s">' % (src, text, text)
     return mark_safe(tag)
 
+@register.simple_tag(takes_context=True, name='ia')
+def inline_animation(context, text):
+    uuid = context.get('uuid', 'id')
+    request = context['request']
+    src = request.build_absolute_uri(reverse('inline_text_animation'))
+    src = '%s?param=%s&id=%s' % (src, text, uuid)
+    tag = '<img src="%s" alt="%s" title="%s">' % (src, text, text)
+    return mark_safe(tag)
+
 @register.simple_tag(takes_context=True, name='leader')
 def leader_image(context, position):
     uuid = context.get('uuid', 'id')

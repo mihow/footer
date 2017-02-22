@@ -1,6 +1,10 @@
-#import PIL
-import cairosvg
+import os
+import tempfile
+
 from django.template import Template, Context
+import cairosvg
+from PIL import Image
+from io import BytesIO, StringIO
 
 
 
@@ -78,3 +82,49 @@ def inline_text_image(text, outfile, fontsize=12):
     return outfile
     
 
+#@TODO python2 unicode compatability method
+def inline_text_animation(text_lines, outfile, fontsize=12):
+    if not hasattr(text_lines, '__iter__'):
+        text_lines = [text_lines]
+
+    tempfiles = []
+    height = 0
+    width = 0
+    for line in text_lines:
+        f = tempfile.NamedTemporaryFile(suffix='.png')
+        inline_text_image(line, f, fontsize)
+        tempfiles.append(f)
+
+    frames = []
+    for f in tempfiles:
+        f.seek(0)
+        img = Image.open(f)
+        print(f.name, img.width, img.height)
+
+        # Use the greatest width and height we find
+        if img.height > height:
+            height = img.height
+        if img.width > width:
+            width = img.width
+
+        # Set the background color to white
+        bg = Image.new("RGB", img.size, (255,255,255))
+        bg.paste(img, img)
+        frames.append(bg)
+
+    for i, img in enumerate(frames):
+        # Place each frame on the biggest canvas size we need
+        bg = Image.new("RGB", (width, height), (255,255,255))
+        bg.paste(img, (0, 0, img.width, img.height))
+        frames[i] = bg
+
+    frames[0].save(outfile,
+             format='gif',
+             #transparency=255,
+             save_all=True, 
+             append_images=frames[1:],
+             loop=0,
+             optimize=True,
+             duration=500,)
+
+    return outfile

@@ -50,6 +50,9 @@ class FooterRequest(View):
 
         return super(FooterRequest, self).dispatch(request, *args, **kwargs)
 
+    def history(self):
+        return ['food', 'magic', 'beans', 'goodnight moon!']
+
     def timestamp(self):
         # @TODO still not working?
         location = self.get_location()
@@ -189,6 +192,28 @@ class InlineTextImage(FooterRequest):
 	        #log.error(e)
 	        value = "Unavailable (%s)" % e
         svg = images.inline_text_image(value, resp)
+        
+        return resp
+
+
+class InlineTextAnimation(FooterRequest):
+
+    @never_cache
+    def get(self, request):
+
+        resp = HttpResponse(content_type='image/gif')
+	param = request.GET.get('param')
+	# text = request.GET.get('text', '?')
+	if not hasattr(self, param):
+	    value = "Not Implemented"
+	else:
+	    try:
+		value_list = getattr(self, param)()
+	    except AttributeError as e:
+	        #log.error(e)
+	        value_list = ["Unavailable", e]
+
+        images.inline_text_animation(value_list, resp)
         
         return resp
 

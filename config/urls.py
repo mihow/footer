@@ -10,7 +10,13 @@ from django.views import defaults as default_views
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt # @TODO needed?
 
-from footer.magic.views import TestImageView, InlineTextImage, LeaderImageView, IndexView, SendEmailView
+from footer.magic.views import (
+        TestImageView, 
+        InlineTextImage, 
+        InlineTextAnimation, 
+        LeaderImageView, 
+        IndexView, 
+        SendEmailView)
 
 urlpatterns = [
     url(r'^$', IndexView.as_view(), name='home'),
@@ -29,6 +35,7 @@ urlpatterns = [
     #url(r'^image(?P<uuid>\w+)?.jpg$', FooterView.as_view(), name='test_image'),
     url(r'^image.png', never_cache(TestImageView.as_view()), name='test_image'),
     url(r'^text.png', never_cache(InlineTextImage.as_view()), name='inline_text_image'),
+    url(r'^animation.gif', never_cache(InlineTextAnimation.as_view()), name='inline_text_animation'),
     url(r'^leader.gif', never_cache(LeaderImageView.as_view()), name='leader_image'),
     url(r'^email_preview', TemplateView.as_view(template_name='email.html'), 
         name='email_preview'),
