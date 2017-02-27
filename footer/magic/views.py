@@ -210,14 +210,9 @@ class IndexView(FooterEmailInstance):
 class InlineTextImage(FooterRequest):
 
     @never_cache
-    def get(self, request):
+    def get(self, request, param):
 
         resp = HttpResponse(content_type='image/png')
-	# text = self.kwargs.get('text', '?')
-        # BIG @TODO these need to be LIVE variables from the request
-        # not old text from previous request in browser
-	param = request.GET.get('param')
-	# text = request.GET.get('text', '?')
 	if not hasattr(self, param):
 	    value = "Not Implemented"
 	else:
@@ -234,11 +229,9 @@ class InlineTextImage(FooterRequest):
 class InlineTextAnimation(FooterRequest):
 
     @never_cache
-    def get(self, request):
+    def get(self, request, param):
 
         resp = HttpResponse(content_type='image/gif')
-	param = request.GET.get('param')
-	# text = request.GET.get('text', '?')
 	if not hasattr(self, param):
 	    value = "Not Implemented"
 	else:
