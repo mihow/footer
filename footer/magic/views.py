@@ -171,25 +171,28 @@ class FooterRequest(View):
             return test_ip
 
     def ga_image_url(self):
-        if settings.DEBUG:
-            base_url = 'https://www.google-analytics.com/debug/collect?v=1'
-        else:
-            base_url = 'https://www.google-analytics.com/collect?v=1'
+        base_url = 'https://www.google-analytics.com/collect?v=1'
 
-        request_id = random_num() # @TODO
-        user_id = self.request.session.session_key
+        # if settings.DEBUG:
+        #     base_url = 'https://www.google-analytics.com/debug/collect?v=1'
+
+        # request_id = random_num() # 
+        # user_id = self.request.session.session_key # No sessions
+
+        client_id = random_num()
 
         url = ('{base_url}'
                '&tid={ga_id}'
-               '&uid={user_id}'
-               '&cid={request_id}'
-               '&t=event&ec=email&ea=open'
-               '&dp=/email/{request_id}'
+               '&cid={client_id}'
+               '&t=event'
+               '&ec=email'
+               '&ea=open'
+               '&el={client_id}'
+               '&dp=/email/{client_id}'
                ''.format(
                   base_url=base_url,
                   ga_id=settings.GOOGLE_ANALYTICS_ID,
-                  request_id=request_id,
-                  user_id=user_id)
+                  client_id=client_id)
               )
 
         return url
