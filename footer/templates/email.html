@@ -1,5 +1,6 @@
 {% load footer_magic %}
 
+<p style="font-family: {{ view.styles.font_family }}; font-size: {{ view.styles.font_size }}; color: {{ view.styles.font_color }};"</p>
 {% leader 'start' %}<br>
 <br>
 TIME: {% ii 'timestamp' %}<br>
@@ -16,5 +17,7 @@ TOTAL_NUM_REQUESTS_TODAY: {% ii 'request_count_today' %}<br>
 TOTAL_NUM_REQUESTS_IN_LAST_MINUTE: {% ii 'request_count_now' %}<br>
 <br>
 {% leader 'end' %}<br>
+</p>
+
 <br>
 <img src="{{ view.ga_image_url }}" />

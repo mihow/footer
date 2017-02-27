@@ -194,9 +194,12 @@ class FooterRequest(View):
 
         return url
 
-    # # Allow POSTs so we can use this request inside SendEmailView
-    # def post(self, request, *args, **kwargs):
-    #     return super(FooterRequest, self).get(request, *args, **kwargs)
+    def styles(self):
+        return {
+            'font_family': 'courier',
+            'font_size': '10px',
+            'font_color': '#000000',
+        }
 
 
 class FooterEmailInstance(TemplateView, FooterRequest):
@@ -221,7 +224,7 @@ class InlineTextImage(FooterRequest):
 	    except AttributeError as e:
 	        #log.error(e)
 	        value = "Unavailable (%s)" % e
-        svg = images.inline_text_image(value, resp)
+        svg = images.inline_text_image(value, resp, styles=self.styles())
         
         return resp
 
@@ -241,7 +244,7 @@ class InlineTextAnimation(FooterRequest):
 	        #log.error(e)
 	        value_list = ["Unavailable", e]
 
-        images.inline_text_animation(value_list, resp)
+        images.inline_text_animation(value_list, resp, styles=self.styles())
         
         return resp
 

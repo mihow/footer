@@ -1,5 +1,6 @@
 import os
 import tempfile
+import re
 
 from django.template import Template, Context
 import cairosvg
@@ -7,6 +8,11 @@ from PIL import Image
 from io import BytesIO, StringIO
 
 
+DEFAULT_STYLES = {
+    'font_size': '10px',
+    'font_family': 'courier',
+    'font_color': 'green',
+}
 
 def make_svg(context):
     svg_tmpl = Template("""
@@ -49,19 +55,31 @@ def write_svg_to_png(svg_raw, outfile):
 
 
 #@TODO python2 unicode compatability method
-def inline_text_image(text, outfile, fontsize=12):
+def inline_text_image(text, outfile, styles={}):
 
     text = str(text) or "?"
+   
+    for key, val in DEFAULT_STYLES.items():
+        if key not in styles:
+            styles[key] = val
 
-    width = int((len(text) * fontsize) * 0.60)
-    height = int((1 * fontsize) * 1.1)
+    try:
+        unit_size = re.findall(
+            '\d+', styles.get('font_size', '10px'))[0]
+        unit_size = int(unit_size)
+    except (IndexError, TypeError) as e:
+        unit_size = 10
+
+    width = int((len(text) * unit_size) * 0.60)
+    height = int((1 * unit_size) * 1.1)
+    print width, height
     text = text.upper()
 
     svg_tmpl = Template("""
     <svg xmlns="http://www.w3.org/2000/svg"
       width="{{ width }}" height="{{ height }}" viewBox="0 0 {{ width }} {{ height }}">
 
-      <text x="0" y="0" font-family="monospace" font-size="{{ fontsize }}" fill="green" dy="0">
+      <text x="0" y="0" font-family="{{ styles.font_family }}" font-size="{{ styles.font_size }}" fill="{{ styles.font_color }}" dy="0">
           <tspan x="0" dy="1.0em">
               {{ text }}
           </tspan>
@@ -72,7 +90,7 @@ def inline_text_image(text, outfile, fontsize=12):
     context = {
         'width': width,
         'height': height,
-        'fontsize': fontsize,
+        'styles': styles,
         'text': text}
 
     svg = svg_tmpl.render(Context(context))
@@ -83,7 +101,7 @@ def inline_text_image(text, outfile, fontsize=12):
     
 
 #@TODO python2 unicode compatability method
-def inline_text_animation(text_lines, outfile, fontsize=12):
+def inline_text_animation(text_lines, outfile, styles={}):
     if not hasattr(text_lines, '__iter__'):
         text_lines = [text_lines]
 
@@ -95,7 +113,7 @@ def inline_text_animation(text_lines, outfile, fontsize=12):
     width = 0
     for line in text_lines:
         f = tempfile.NamedTemporaryFile(suffix='.png')
-        inline_text_image(line, f, fontsize)
+        inline_text_image(line, f, styles)
         tempfiles.append(f)
 
     frames = []
