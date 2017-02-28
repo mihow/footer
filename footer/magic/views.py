@@ -210,7 +210,7 @@ class FooterRequest(View):
         }
 
 
-class FooterEmailInstance(TemplateView, FooterRequest):
+class FooterEmailInstance(FooterRequest, TemplateView):
     template_name = 'email.html'
 
 
@@ -301,8 +301,18 @@ class SendEmailView(View):
         {% endautoescape %}
         """)
 
+        view_instance = FooterEmailInstance()
+        view_instance.request = request
+        # @TODO render HTML from this view instance
+
         body = body_tmpl.render(Context({
-            'footer': render_to_string('email.html', request=request)
+            'footer': render_to_string(
+                'email.html', 
+                request=request,
+                context={'view': {
+                    'styles': view_instance.styles(),
+                    'ga_image_url': view_instance.ga_image_url() 
+                }})
             }))
 
         subject = 'Footer project test #{}'.format(request_id)

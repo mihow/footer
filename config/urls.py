@@ -16,7 +16,8 @@ from footer.magic.views import (
         InlineTextAnimation, 
         LeaderImageView, 
         IndexView, 
-        SendEmailView)
+        SendEmailView,
+        FooterEmailInstance)
 
 urlpatterns = [
     url(r'^$', IndexView.as_view(), name='home'),
@@ -41,7 +42,7 @@ urlpatterns = [
         never_cache(InlineTextAnimation.as_view()), name='inline_text_animation'),
 
     url(r'^leader.gif', never_cache(LeaderImageView.as_view()), name='leader_image'),
-    url(r'^email_preview', TemplateView.as_view(template_name='email.html'), 
+    url(r'^email_preview', FooterEmailInstance.as_view(), 
         name='email_preview'),
     url(r'^send_email/?$', csrf_exempt(SendEmailView.as_view()), name='send_email'),
 
