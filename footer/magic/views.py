@@ -2,6 +2,7 @@ import os
 import random
 import datetime as dt
 import json
+from urllib import urlencode
 
 from django.http import HttpResponse, JsonResponse
 from django.views import View
@@ -171,30 +172,33 @@ class FooterRequest(View):
             return test_ip
 
     def ga_image_url(self):
-        base_url = 'https://www.google-analytics.com/collect?v=1'
+        base_url = 'https://www.google-analytics.com/collect'
 
         # if settings.DEBUG:
-        #     base_url = 'https://www.google-analytics.com/debug/collect?v=1'
+        #     base_url = 'https://www.google-analytics.com/debug/collect'
 
         # request_id = random_num() # 
         # user_id = self.request.session.session_key # No sessions
 
+        ga_id = settings.GOOGLE_ANALYTICS_ID
         user_id = settings.GOOGLE_ANALYTICS_USER_VERSION
 
-        url = ('{base_url}'
-               '&tid={ga_id}'
-               '&uid={user_id}'
-               '&t=event'
-               '&ec=email'
-               '&ea=open'
-               '&el={user_id}'
-               '&dp=/email/{user_id}'
-               '&sc=start' # Start a new session every time
-               ''.format(
-                  base_url=base_url,
-                  ga_id=settings.GOOGLE_ANALYTICS_ID,
-                  user_id=user_id)
-              )
+        params = (
+           ('v', 1),
+           ('tid', ga_id),
+           ('uid', user_id),
+           ('t',   'event'),
+           ('ec',  'footer'),
+           ('ea',  'view'),
+           ('el',  user_id),
+           ('dp',  '/email/%s' % user_id),
+           ('dt',  'Email with Footer #%s' % user_id),
+           ('cm',  'email'),
+           ('ci',  user_id),
+           ('sc',  'start'), # Start a new session every time
+        )
+
+        url = "%s?%s" % (base_url, urlencode(params))
 
         return url
 
