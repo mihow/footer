@@ -201,7 +201,7 @@ class FooterRequest(View):
     def styles(self):
         return {
             'font_family': 'courier',
-            'font_size': '10px',
+            'font_size': '12px',
             'font_color': '#000000',
         }
 
@@ -272,7 +272,7 @@ class LeaderImageView(FooterRequest):
                 text = "[LEADER ORPHAN!]"
         else:
             text = "[LEADER FAILED!]"
-        svg = images.inline_text_image(text, resp)
+        svg = images.inline_text_image(text, resp, styles=self.styles())
         
         return resp
 
