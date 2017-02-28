@@ -179,20 +179,21 @@ class FooterRequest(View):
         # request_id = random_num() # 
         # user_id = self.request.session.session_key # No sessions
 
-        client_id = random_num()
+        user_id = settings.GOOGLE_ANALYTICS_USER_VERSION
 
         url = ('{base_url}'
                '&tid={ga_id}'
-               '&cid={client_id}'
+               '&uid={user_id}'
                '&t=event'
                '&ec=email'
                '&ea=open'
-               '&el={client_id}'
-               '&dp=/email/{client_id}'
+               '&el={user_id}'
+               '&dp=/email/{user_id}'
+               '&sc=start' # Start a new session every time
                ''.format(
                   base_url=base_url,
                   ga_id=settings.GOOGLE_ANALYTICS_ID,
-                  client_id=client_id)
+                  user_id=user_id)
               )
 
         return url
