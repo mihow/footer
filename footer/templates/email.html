@@ -3,7 +3,7 @@
 <p style="font-family: {{ view.styles.font_family }}; font-size: {{ view.styles.font_size }}; color: {{ view.styles.font_color }}; line-height: 1.4em;"</p>
 {% leader 'start' %}<br>
 <br>
-Location of Recipient: <a href="{{ map_url }}">{% ii 'location' %}</a><br>
+Location of Recipient: {% ii 'location' %}(<a href="{% url 'map' %}">map</a>)<br>
 Time of This Receipt: {% ii 'timestamp' %}<br>
 Recipient Agent: {% ia 'user_agent_animation' %}<br>
 Previous Receipts of This Message: {% ia 'history_animation' %}<br>

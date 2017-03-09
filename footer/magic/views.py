@@ -4,7 +4,7 @@ import datetime as dt
 import json
 from urllib import urlencode
 
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.views import View
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template import Template, Context
@@ -237,6 +237,20 @@ class FooterEmailInstance(FooterRequest, TemplateView):
 
 class IndexView(FooterEmailInstance):
     template_name = 'index.html'
+
+
+class MapLink(FooterRequest):
+
+    @never_cache
+    def get(self, request):
+
+        loc = self.get_location() 
+
+        url = 'https://maps.google.com/?q={lat},{lon}&ll={lat},{lon}&z=6'.format(
+                    lat=loc.location.latitude, 
+                    lon=loc.location.longitude)
+
+        return HttpResponseRedirect(url)
 
 
 class InlineTextImage(FooterRequest):

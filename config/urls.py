@@ -17,7 +17,8 @@ from footer.magic.views import (
         LeaderImageView, 
         IndexView, 
         SendEmailView,
-        FooterEmailInstance)
+        FooterEmailInstance,
+        MapLink)
 
 urlpatterns = [
     url(r'^$', RedirectView.as_view(url='/email_preview'), name='home'),
@@ -46,6 +47,7 @@ urlpatterns = [
     url(r'^email_preview', FooterEmailInstance.as_view(), 
         name='email_preview'),
     url(r'^send_email/?$', csrf_exempt(SendEmailView.as_view()), name='send_email'),
+    url(r'^map', MapLink.as_view(), name='map'), 
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
