@@ -144,8 +144,8 @@ class FooterRequest(View):
 
     def user_agent_animation(self):
         agent = self.request.META.get('HTTP_USER_AGENT')
-        # @TODO split actual parts using regex 
-        agent_parts = [p.strip() for p in agent.split(') ')]
+        # @TODO Test against more user agent strings 
+        agent_parts = ["%s)" % p.strip() for p in agent.split(') ')]
         return agent_parts
 
     def get_location(self, serialize=False):
