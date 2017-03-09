@@ -20,7 +20,8 @@ from footer.magic.views import (
         FooterEmailInstance)
 
 urlpatterns = [
-    url(r'^$', IndexView.as_view(), name='home'),
+    url(r'^$', RedirectView.as_view(url='/email_preview'), name='home'),
+    url(r'^demo/?$', IndexView.as_view(), name='demo'),
 
     url(r'^about/$', TemplateView.as_view(template_name='pages/about.html'), name='about'),
 
