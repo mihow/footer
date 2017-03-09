@@ -127,6 +127,19 @@ class FooterRequest(View):
         else:
             return "Unknown"
 
+    def location_animation(self):
+        loc = self.get_location()
+        if loc:
+            loc_parts = [loc.city.name, 
+                         loc.subdivisions.most_specific.name, 
+                         loc.country.name,
+                         self.ip()]
+        else:
+            loc_parts = ["Unknown", self.ip()]
+
+        return loc_parts
+
+
     def location_accuracy(self):
         location = self.get_location()
 	if location:
@@ -260,13 +273,13 @@ class InlineTextImage(FooterRequest):
 
         resp = HttpResponse(content_type='image/png')
 	if not hasattr(self, param):
-	    value = "Not Implemented."
+	    value = "Not Implemented"
 	else:
 	    try:
-		value = "%s." % getattr(self, param)()
+		value = u"%s" % getattr(self, param)()
 	    except AttributeError as e:
 	        #log.error(e)
-	        value = "Unavailable (%s)." % e
+	        value = u"Unavailable (%s)" % e
         svg = images.inline_text_image(value, resp, styles=self.styles())
         
         return resp
@@ -279,13 +292,13 @@ class InlineTextAnimation(FooterRequest):
 
         resp = HttpResponse(content_type='image/gif')
 	if not hasattr(self, param):
-	    value = "Not Implemented."
+	    value = "Not Implemented"
 	else:
 	    try:
-		value_list = ["%s." % v for v in getattr(self, param)()]
+		value_list = [u"%s" % v for v in getattr(self, param)()]
 	    except AttributeError as e:
 	        #log.error(e)
-	        value_list = ["Unavailable.", e]
+	        value_list = ["Unavailable", e]
 
         images.inline_text_animation(value_list, resp, styles=self.styles())
         
@@ -304,7 +317,7 @@ class LeaderImageView(FooterRequest):
         resp = HttpResponse(content_type='image/gif')
         if self.is_leader:
             if 'start' in request.GET:
-                text = "."
+                text = " "
             elif 'end' in request.GET:
                 text = "[LEADER END]"
             else: 

@@ -2,11 +2,10 @@
 
 <p style="font-family: {{ view.styles.font_family }}; font-size: {{ view.styles.font_size }}; color: {{ view.styles.font_color }}; line-height: 1.4em;"</p>
 {% leader 'start' %}<br>
-<br>
-Location of Recipient: {% ii 'location' %}(<a href="{% url 'map' %}">map</a>)<br>
 Time of This Receipt: {% ii 'timestamp' %}<br>
-Recipient Agent: {% ia 'user_agent_animation' %}<br>
-<br>
+Location of Recipient: {% ia 'location_animation' %}<br>
+Accuracy Radius: {% ii 'location_accuracy' %} <a href="{% url 'map' %}">Map</a><br>
+Recipient Agent: {% ii 'user_agent' %}<br>
 <img src="{{ view.ga_image_url }}" /><br>
 </p>
 
