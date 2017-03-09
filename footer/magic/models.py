@@ -61,9 +61,10 @@ class FooterRequest(models.Model):
     def location_str(self):
         if self.location:
             if hasattr(self.location, 'items'):
-                city = str(self.location.get('city'))
-                country = str(self.location.get('country'))
-                return ", ".join([c for c in [city, country] if c])
+                city = self.location.get('city')
+                region = self.location.get('region')
+                country = self.location.get('country')
+                return "/".join([c for c in [city, region, country] if c])
         return "Unknown"
 
 

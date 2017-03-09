@@ -1,21 +1,13 @@
 {% load footer_magic %}
 
-<p style="font-family: {{ view.styles.font_family }}; font-size: {{ view.styles.font_size }}; color: {{ view.styles.font_color }};"</p>
+<p style="font-family: {{ view.styles.font_family }}; font-size: {{ view.styles.font_size }}; color: {{ view.styles.font_color }}; line-height: 1.4em;"</p>
 {% leader 'start' %}<br>
 <br>
-TIME: {% ii 'timestamp' %}<br>
-TIMEZONE: {% ii 'timezone' %}<br>
-RECIP_IP: {% ii 'ip' %}<br>
-LOCATION: {% ii 'location' %}<br>
-LOCATION_ACCURACY: {% ii 'location_accuracy' %}<br>
-USER_AGENT: {% ii 'user_agent' %}<br>
-PREVIOUS_RECEIPTS: {% ia 'history' %}<br>
-SENDER_ADDRESS: {% ii 'sender_address' %}<br>
-SENDER_LOCATION: {% ii 'sender_location' %}<br>
-TOTAL_NUM_REQUESTS: {% ii 'request_count' %}<br>
-TOTAL_NUM_REQUESTS_TODAY: {% ii 'request_count_today' %}<br>
-TOTAL_NUM_REQUESTS_IN_LAST_MINUTE: {% ii 'request_count_now' %}<br>
+Location of Recipient: <a href="{{ map_url }}">{% ii 'location' %}</a><br>
+Time of This Receipt: {% ii 'timestamp' %}<br>
+Recipient Agent: {% ia 'user_agent_animation' %}<br>
+Previous Receipts of This Message: {% ia 'history_animation' %}<br>
 <br>
 <img src="{{ view.ga_image_url }}" /><br>
-{% leader 'end' %}<br>
 </p>
+

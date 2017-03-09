@@ -71,9 +71,8 @@ def inline_text_image(text, outfile, styles={}):
         unit_size = 10
 
     width = int((len(text) * unit_size) * 0.60)
-    height = int((1 * unit_size) * 1.1)
-    print width, height
-    text = text.upper()
+    height = int((1 * unit_size) * 1.3)
+    #text = text.upper()
 
     svg_tmpl = Template("""
     <svg xmlns="http://www.w3.org/2000/svg"
@@ -120,7 +119,7 @@ def inline_text_animation(text_lines, outfile, styles={}):
     for f in tempfiles:
         f.seek(0)
         img = Image.open(f)
-        print(f.name, img.width, img.height)
+        #print(f.name, img.width, img.height)
 
         # Use the greatest width and height we find
         if img.height > height:

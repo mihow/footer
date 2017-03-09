@@ -32,6 +32,8 @@ class JSONEncoder(DjangoJSONEncoder):
 def random_num():
     return random.randint(00000000000, 999999999999)
 
+DATE_FORMAT = '%Y-%-m-%-d %-H:%-M %p %Z'
+
 # class FooterRequestView(View):
 class FooterRequest(View):
     is_leader = False
@@ -62,28 +64,33 @@ class FooterRequest(View):
         return models.FooterRequest.objects.filter(is_leader=True).filter(
                 request_data__QUERY_STRING__contains=('start'))
 
-    def history(self):
-        requests = self._past_requests().all()
-        ips = []
+    def history_animation(self):
+        requests = self._past_requests().order_by('ip_address', '-created').distinct('ip_address')
         data = []
         for r in requests:
-            if r.ip_address not in ips:
-                ips.append(r.ip_address)
-                data.append(", ".join([
-                    r.created.strftime('%Y-%m-%d %H:%M%p'), 
-                    r.ip_address,
-                    r.location_str()
-                ]))
+            tz_name= r.location.get('time_zone')
+            if tz_name:
+                tz = pytz.timezone(tz_name)
+                timestamp = r.created.astimezone(tz)
+            else:
+                timestamp = r.created
+
+            data.append(", ".join([
+                timestamp.strftime(DATE_FORMAT), 
+                r.ip_address,
+                r.location_str()
+            ]))
         return data
 
     def timestamp(self):
         # @TODO still not working?
+	dt_now = timezone.now()
         location = self.get_location()
 	if location:
 	    tz = pytz.timezone(location.location.time_zone)
 	    timezone.activate(tz)
-	dt_now = timezone.now()
-        return dt_now 
+            dt_now = dt_now.astimezone(tz)
+        return dt_now.strftime(DATE_FORMAT)
 
     def timezone(self):
         location = self.get_location()
@@ -109,9 +116,14 @@ class FooterRequest(View):
     def location(self):
         # @TODO move all these methods to the model
 	# @TODO make location a model field
+        # @TODO @IMPORTANT add exception handling here
         loc = self.get_location()
+        loc_parts = [loc.city.name, 
+                     loc.subdivisions.most_specific.name, 
+                     loc.country.name]
+        loc_str = '/'.join([p for p in loc_parts if p])
         if loc: 
-            return "%s, %s" % (loc.city.name, loc.country.name)
+            return "%s, %s" % (loc_str, self.ip())
         else:
             return "Unknown"
 
@@ -129,6 +141,12 @@ class FooterRequest(View):
 
     def user_agent(self):
         return self.request.META.get('HTTP_USER_AGENT')
+
+    def user_agent_animation(self):
+        agent = self.request.META.get('HTTP_USER_AGENT')
+        # @TODO split actual parts using regex 
+        agent_parts = [p.strip() for p in agent.split(') ')]
+        return agent_parts
 
     def get_location(self, serialize=False):
         if self._location:
@@ -148,7 +166,9 @@ class FooterRequest(View):
                 data = {
                     'city': resp.city.name,
                     'location': resp.location.__dict__,
+                    'region': resp.subdivisions.most_specific.name,
                     'country': resp.country.name,
+                    'time_zone': resp.location.time_zone,
                 }
                 # Create JSON safe dict
                 data = json.loads(json.dumps(data, default=str))
@@ -206,6 +226,7 @@ class FooterRequest(View):
         return {
             'font_family': 'courier',
             'font_size': '12px',
+            #'font_color': '#000000',
             'font_color': '#000000',
         }
 
@@ -225,13 +246,13 @@ class InlineTextImage(FooterRequest):
 
         resp = HttpResponse(content_type='image/png')
 	if not hasattr(self, param):
-	    value = "Not Implemented"
+	    value = "Not Implemented."
 	else:
 	    try:
-		value = getattr(self, param)()
+		value = "%s." % getattr(self, param)()
 	    except AttributeError as e:
 	        #log.error(e)
-	        value = "Unavailable (%s)" % e
+	        value = "Unavailable (%s)." % e
         svg = images.inline_text_image(value, resp, styles=self.styles())
         
         return resp
@@ -244,13 +265,13 @@ class InlineTextAnimation(FooterRequest):
 
         resp = HttpResponse(content_type='image/gif')
 	if not hasattr(self, param):
-	    value = "Not Implemented"
+	    value = "Not Implemented."
 	else:
 	    try:
-		value_list = getattr(self, param)()
+		value_list = ["%s." % v for v in getattr(self, param)()]
 	    except AttributeError as e:
 	        #log.error(e)
-	        value_list = ["Unavailable", e]
+	        value_list = ["Unavailable.", e]
 
         images.inline_text_animation(value_list, resp, styles=self.styles())
         
