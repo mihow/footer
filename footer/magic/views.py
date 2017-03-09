@@ -290,7 +290,7 @@ class LeaderImageView(FooterRequest):
         resp = HttpResponse(content_type='image/gif')
         if self.is_leader:
             if 'start' in request.GET:
-                text = "[LEADER START]"
+                text = "."
             elif 'end' in request.GET:
                 text = "[LEADER END]"
             else: 
