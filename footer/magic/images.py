@@ -145,6 +145,6 @@ def inline_text_animation(text_lines, outfile, styles={}):
              append_images=frames[1:],
              loop=0,
              optimize=True,
-             duration=500,)
+             duration=900,)
 
     return outfile
