@@ -206,7 +206,7 @@ class FooterRequest(View):
         params = (
            ('v', 1),
            ('tid', ga_id),
-           ('cid', user_id),
+           ('uid', user_id),
            ('t',   'event'),
            ('ec',  'footer'),
            ('ea',  'view'),
