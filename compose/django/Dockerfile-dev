@@ -13,6 +13,26 @@ RUN chmod +x /entrypoint.sh
 COPY ./compose/django/start-dev.sh /start-dev.sh
 RUN sed -i 's/\r//' /start-dev.sh
 RUN chmod +x /start-dev.sh
+    
+
+# # Install Microsoft Fonts
+# References:
+# http://askubuntu.com/a/25614
+# https://packages.debian.org/jessie/ttf-mscorefonts-installer 
+# https://github.com/captnswing/msttcorefonts
+# https://hub.docker.com/r/shopify/golang-phantomjs/~/dockerfile/
+# # ---------
+RUN echo "deb http://httpredir.debian.org/debian jessie contrib" >> /etc/apt/sources.list
+RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
+RUN apt-get update
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y ttf-mscorefonts-installer
+
+# # Optional configuration for fonts, doesn't seem to have an effect
+# # on our current use case:
+# ADD ./compose/django/localfonts.conf /etc/fonts/local.conf
+
+RUN fc-cache -f -v
+
 
 WORKDIR /app
 

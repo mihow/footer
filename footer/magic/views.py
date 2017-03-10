@@ -237,9 +237,8 @@ class FooterRequest(View):
 
     def styles(self):
         return {
-            'font_family': 'courier',
+            'font_family': 'Times New Roman',
             'font_size': '12px',
-            #'font_color': '#000000',
             'font_color': '#000000',
         }
 

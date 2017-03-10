@@ -21,6 +21,13 @@ RUN sed -i 's/\r//' /entrypoint.sh \
     && chmod +x /gunicorn.sh \
     && chown django /gunicorn.sh
 
+# # Install Microsoft Fonts (see dev Dockerfile for more notes)
+RUN echo "deb http://httpredir.debian.org/debian jessie contrib" >> /etc/apt/sources.list
+RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
+RUN apt-get update
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y ttf-mscorefonts-installer
+RUN fc-cache -f -v
+
 WORKDIR /app
 
 ENTRYPOINT ["/entrypoint.sh"]
