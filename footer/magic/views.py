@@ -237,8 +237,12 @@ class FooterRequest(View):
 
     def styles(self):
         return {
-            'font_family': 'Times New Roman',
-            'font_size': '12px',
+            # Font & size now only apply to Image Styles
+            # Static text styles are currently set in the email.html
+            # template.
+            #'font_family': 'Lucida Sans Typewriter',
+            'font_family': 'Courier New',
+            'font_size': '11px',
             'font_color': '#000000',
         }
 

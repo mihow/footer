@@ -65,12 +65,12 @@ def inline_text_image(text, outfile, styles={}):
 
     try:
         unit_size = re.findall(
-            '\d+', styles.get('font_size', '10px'))[0]
+            '\d+', styles['font_size'])[0]
         unit_size = int(unit_size)
     except (IndexError, TypeError) as e:
         unit_size = 10
 
-    width = int((len(text) * unit_size) * 0.60)
+    width = int((len(text) * unit_size) * 0.70)
     height = int((1 * unit_size) * 1.3)
     #text = text.upper()
 

@@ -1,6 +1,9 @@
 {% load footer_magic %}
 
-<p style="font-family: {{ view.styles.font_family }}; font-size: {{ view.styles.font_size }}; color: {{ view.styles.font_color }}; line-height: 1.4em;"</p>
+{% comment %}
+<p style="font-family: 'Lucida Console', 'Lucida Sans Typewriter', 'Courier New', monospace; font-size: 12px; color: {{ view.styles.font_color }}; line-height: 1.4em;"</p>
+{% endcomment %}
+<p style="font-family: 'Courier New', monospace; font-size: 12px; color: {{ view.styles.font_color }}; line-height: 1.4em;"</p>
 {% leader 'start' %}<br>
 Time of This Receipt: {% ii 'timestamp' %}<br>
 Location of Recipient: {% ia 'location_animation' %}<br>
