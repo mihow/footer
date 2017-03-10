@@ -322,9 +322,9 @@ class LeaderImageView(FooterRequest):
             if 'start' in request.GET:
                 text = " "
             elif 'end' in request.GET:
-                text = "[LEADER END]"
+                text = " "
             else: 
-                text = "[LEADER ORPHAN!]"
+                text = " "
         else:
             text = "[LEADER FAILED!]"
         svg = images.inline_text_image(text, resp, styles=self.styles())
