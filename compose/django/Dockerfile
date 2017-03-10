@@ -28,6 +28,8 @@ RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y ttf-mscorefonts-installer
 RUN fc-cache -f -v
 
+COPY ./compose/django/newrelic.ini /newrelic.ini
+
 WORKDIR /app
 
 ENTRYPOINT ["/entrypoint.sh"]

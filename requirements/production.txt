@@ -26,3 +26,7 @@ raven==5.32.0
 # Opbeat agent for performance monitoring
 # -----------------------------------------
 opbeat==3.5.2
+
+# New Relic agent for application monitoring 
+# -----------------------------------------
+newrelic
