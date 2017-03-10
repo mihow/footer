@@ -4,7 +4,8 @@
 {% leader 'start' %}<br>
 Time of This Receipt: {% ii 'timestamp' %}<br>
 Location of Recipient: {% ia 'location_animation' %}<br>
-Accuracy Radius: {% ii 'location_accuracy' %} <a href="{% url 'map' %}">Map</a><br>
+Accuracy Radius: {% ii 'location_accuracy' %} 
+  <a href="{{ request.scheme }}://{{ request.get_host }}{% url 'map' %}">Map</a><br>
 Recipient Agent: {% ii 'user_agent' %}<br>
 <img src="{{ view.ga_image_url }}" /><br>
 </p>
