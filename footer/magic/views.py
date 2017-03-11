@@ -305,7 +305,7 @@ class InlineTextAnimation(FooterRequest):
 
         resp = HttpResponse(content_type='image/gif')
 	if not hasattr(self, param):
-	    value = "Not Implemented"
+	    value_list = ["Not Implemented"]
 	else:
 	    try:
 		value_list = [u"%s" % v for v in getattr(self, param)()]
