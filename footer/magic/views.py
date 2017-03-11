@@ -65,8 +65,7 @@ class FooterRequest(View):
 
     def _past_requests(self):
         # @TODO make this a QueryManager method
-        return models.FooterRequest.objects.filter(is_leader=True).filter(
-                request_data__QUERY_STRING__contains=('start'))
+        return models.FooterRequest.objects.filter(is_leader=True)
 
     def history_animation(self):
         requests = self._past_requests().order_by('ip_address', '-created').distinct('ip_address')
@@ -86,15 +85,17 @@ class FooterRequest(View):
             ]))
         return data
 
-    def timestamp(self):
-        # @TODO still not working?
+    def timestamp(self, as_dt=False):
 	dt_now = timezone.now()
         location = self.get_location()
 	if location:
 	    tz = pytz.timezone(location.location.time_zone)
 	    timezone.activate(tz)
             dt_now = dt_now.astimezone(tz)
-        return dt_now.strftime(DATE_FORMAT)
+        if as_dt:
+            return dt_now
+        else:
+            return dt_now.strftime(DATE_FORMAT)
 
     def timezone(self):
         location = self.get_location()
@@ -108,12 +109,14 @@ class FooterRequest(View):
         return self._past_requests().count()
 
     def request_count_today(self):
-        today_start = self.timestamp().replace(hour=0,minute=0,second=0,microsecond=0)
+        today_start = self.timestamp(as_dt=True).replace(
+                hour=0,minute=0,second=0,microsecond=0)
         return self._past_requests().filter(
 		created__gte=today_start).count()
 
     def request_count_now(self):
-        this_minute = self.timestamp().replace(second=0,microsecond=0)
+        this_minute = self.timestamp(as_dt=True).replace(
+                second=0,microsecond=0)
         return self._past_requests().filter(
 		created__gte=this_minute).count()
 
