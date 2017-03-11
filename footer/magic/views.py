@@ -51,15 +51,15 @@ class FooterRequest(View):
 
         # Convert non-serializable values to strings:
         request_data_safe = json.loads(json.dumps(request_data, default=str))
-        if self.is_leader:
-            # Do we need to save any other requests?
-            self.footer = models.FooterRequest.objects.create(
-                is_leader=self.is_leader,
-                request_data=request_data_safe,
-                location=self.get_location(serialize=True),
-                user_agent=self.user_agent(),
-                ip_address=self.ip(),
-            )
+        # if self.is_leader:
+        # Do we need to save any other requests?
+        self.footer = models.FooterRequest.objects.create(
+            is_leader=self.is_leader,
+            request_data=request_data_safe,
+            location=self.get_location(serialize=True),
+            user_agent=self.user_agent(),
+            ip_address=self.ip(),
+        )
 
         return super(FooterRequest, self).dispatch(request, *args, **kwargs)
 

@@ -53,10 +53,9 @@ class FooterRequest(models.Model):
             return "Footer ?"
 
     def __str__(self):
-        return "Request #%s for %s%s" % (
+        return "Request #%s%s" % (
             self.id, 
-            self.footer_name(),
-            " - LEADER" if self.is_leader else "",)
+            " LEADER" if self.is_leader else "",)
 
     def location_str(self):
         if self.location:
@@ -86,18 +85,23 @@ class FooterRequest(models.Model):
             return None
 
     def is_leader_start(self):
-        if 'start' in self.lookup('QUERY_STRING'):
+        if 'p=1' in self.lookup('QUERY_STRING'):
             return True
         else:
             return False
     is_leader_start.boolean = True
 
     def is_leader_end(self):
-        if 'end' in self.lookup('QUERY_STRING'):
+        if 'p=4' in self.lookup('QUERY_STRING'):
             return True
         else:
             return False
     is_leader_end.boolean = True
+
+    def path(self):
+        return "%s?%s" % (
+                self.lookup('PATH_INFO'), 
+                self.lookup('QUERY_STRING'))
 
     # def user_agent(self):
     #     return self.lookup('HTTP_USER_AGENT') or self.lookup('USER_AGENT')

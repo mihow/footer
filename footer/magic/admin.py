@@ -33,7 +33,7 @@ def format_json_for_display(data):
 
 
 class FooterRequestAdmin(admin.ModelAdmin):
-    list_display = ('__str__', 'is_leader_start', 'is_leader_end', 'created', 
+    list_display = ('__str__', 'path', 'is_leader_start', 'is_leader_end', 'created', 
                     'user_agent', 'location', 'ip_address')
     readonly_fields = ('is_leader', 'data_formatted', 'location_formatted', 'created')
     filter_fields = ('is_leader', 'created')
