@@ -1,13 +1,11 @@
 {% load footer_magic %}
 
 <p style="font-family: 'DejaVu Sans Mono', 'Lucida Sans Typewriter', 'Lucida Console', 'FreeMono', 'Courier', 'Courier New', monospace; font-size: 11px; color: {{ view.styles.font_color }}; line-height: 1.4em;"</p>
-{% leader 'start' %}<br>
-Time of This Receipt: {% ii 'timestamp' %}<br>
-Location of Recipient: {% ia 'location_animation' %}<br>
-Accuracy Radius: {% ii 'location_accuracy' %} 
+Time of This Receipt: {% ii 'timestamp' 1 %}<br>
+Location of Recipient: {% ia 'location_animation' 2 %}<br>
+Accuracy Radius: {% ii 'location_accuracy' 3 %} 
   <a href="{{ request.scheme }}://{{ request.get_host }}{% url 'map' %}">Map</a><br>
-Recipient Agent: {% ii 'user_agent' %}<br>
+Recipient Agent: {% ii 'user_agent' 4 %}<br>
 <img src="{{ view.ga_image_url }}" /><br>
-{% leader 'end' %}<br>
 </p>
 

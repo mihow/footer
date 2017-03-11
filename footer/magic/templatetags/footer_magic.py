@@ -7,16 +7,22 @@ register = template.Library()
 
 
 @register.simple_tag(takes_context=True, name='ii')
-def inline_image(context, param):
+def inline_image(context, param, position=None):
     request = context['request']
-    src = request.build_absolute_uri(reverse('inline_text_image', args=[param]))
+    src = request.build_absolute_uri(
+            reverse('inline_text_image', args=[param]))
+    if position:
+        src = "%s?p=%s" % (src, position)
     tag = '<img src="%s" alt="%s" style="vertical-align: sub;">' % (src, param)
     return mark_safe(tag)
 
 @register.simple_tag(takes_context=True, name='ia')
-def inline_animation(context, param):
+def inline_animation(context, param, position=None):
     request = context['request']
-    src = request.build_absolute_uri(reverse('inline_text_animation', args=[param]))
+    src = request.build_absolute_uri(
+            reverse('inline_text_animation', args=[param]))
+    if position:
+        src = "%s?p=%s" % (src, position)
     tag = '<img src="%s" alt="%s" style="vertical-align: sub;">' % (src, param)
     return mark_safe(tag)
 

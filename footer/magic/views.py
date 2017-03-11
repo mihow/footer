@@ -43,7 +43,11 @@ class FooterRequest(View):
         # Save request record to database
 
         request_data = dict(request.META)
-        # is_leader = True if request.GET.get('leader') else False
+
+        # @TODO complete new leader tracking
+        position = request.GET.get('p')
+        if position == '1':
+            self.is_leader = True
 
         # Convert non-serializable values to strings:
         request_data_safe = json.loads(json.dumps(request_data, default=str))
@@ -308,6 +312,10 @@ class InlineTextAnimation(FooterRequest):
 
 
 class LeaderImageView(FooterRequest):
+    """
+    @TODO OBSOLETE, we now are tracking the order of the viewable images instead
+    """
+
 
     def __init__(self, *args, **kwargs):
         self.is_leader = True
