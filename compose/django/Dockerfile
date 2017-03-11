@@ -22,10 +22,11 @@ RUN sed -i 's/\r//' /entrypoint.sh \
     && chown django /gunicorn.sh
 
 # # Install Microsoft Fonts (see dev Dockerfile for more notes)
-RUN echo "deb http://deb.debian.org/debian jessie contrib non-free" >> /etc/apt/sources.list
-RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
-RUN apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y ttf-mscorefonts-installer
+# RUN echo "deb http://deb.debian.org/debian jessie contrib non-free" >> /etc/apt/sources.list
+# RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
+# RUN apt-get update
+# RUN DEBIAN_FRONTEND=noninteractive apt-get install -y ttf-mscorefonts-installer
+COPY ./compose/django/localfonts.conf /etc/fonts/local.conf
 RUN fc-cache -f -v
 
 COPY ./compose/django/newrelic.ini /newrelic.ini

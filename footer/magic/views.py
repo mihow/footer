@@ -247,8 +247,12 @@ class FooterRequest(View):
             # Font & size now only apply to Image Styles
             # Static text styles are currently set in the email.html
             # template.
-            'font_family': 'Lucida Sans Typewriter',
-            'font_size': '11px',
+            #'font_family': 'DejaVu Sans Mono',
+            #'font_family': 'Andale Mono',
+            #'font_family': 'default',
+            #'font_family': 'Times New Roman',
+            'font_family': 'Liberation Mono',
+            'font_size': '10px',
             'font_color': '#000000',
         }
 
