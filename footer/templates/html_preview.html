@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Copy & Paste HTML for Footer Project</title>
+        <meta charset="utf-8"/>
+    </head>
+    <body>
+        <h2>Copy and paste the HTML below for the email signature:</h2>
+        {% spaceless %}
+        <textarea cols="160" rows ="20" readonly=readonly>
+            {% include 'email.html' %}
+        </textarea>
+        {% endspaceless %}
+
+        <br><br>
+
+        <h2>Preview of rendered footer:</h2>
+        {% include 'email.html' %}
+    </body>
+</html>

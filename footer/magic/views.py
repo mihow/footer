@@ -258,7 +258,7 @@ class FooterRequest(View):
 
 
 class FooterEmailInstance(FooterRequest, TemplateView):
-    template_name = 'email.html'
+    template_name = 'html_preview.html'
 
 
 class IndexView(FooterEmailInstance):

@@ -44,8 +44,10 @@ urlpatterns = [
         never_cache(InlineTextAnimation.as_view()), name='inline_text_animation'),
 
     url(r'^leader.gif', never_cache(LeaderImageView.as_view()), name='leader_image'),
-    url(r'^email_preview', FooterEmailInstance.as_view(), 
+
+    url(r'^email_preview/?$', FooterEmailInstance.as_view(),
         name='email_preview'),
+
     url(r'^send_email/?$', csrf_exempt(SendEmailView.as_view()), name='send_email'),
     url(r'^map', MapLink.as_view(), name='map'), 
 
