@@ -18,11 +18,13 @@ from footer.magic.views import (
         IndexView, 
         SendEmailView,
         FooterEmailInstance,
-        MapLink)
+        MapLink,
+        DashboardView)
 
 urlpatterns = [
     url(r'^$', RedirectView.as_view(url='/email_preview'), name='home'),
     url(r'^demo/?$', IndexView.as_view(), name='demo'),
+    url(r'^dashboard/?$', DashboardView.as_view(), name='dashboard'),
 
     url(r'^about/$', TemplateView.as_view(template_name='pages/about.html'), name='about'),
 

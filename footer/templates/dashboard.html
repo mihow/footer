@@ -1,0 +1,21 @@
+<h4>Requests count: {{ footer_requests.count }}</h4>
+
+<h3>All requests</h3>
+<table>
+{% for fr in footer_requests %}
+<tr>
+    <td>{{ fr.id }}</td>
+    <td>{{ fr.location.city }}</td>
+    <td>{{ fr.created }}</td>
+</tr>
+{% endfor %}
+<table>
+
+<h3>Images</h3>
+<table>
+{% for img in images %}
+<tr>
+    <td>{{ img }}</td>
+</tr>
+{% endfor %}
+<table>

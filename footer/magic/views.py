@@ -2,6 +2,7 @@ import os
 import random
 import datetime as dt
 import json
+import re
 from urllib import urlencode
 
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
@@ -45,8 +46,8 @@ class FooterRequest(View):
         request_data = dict(request.META)
 
         # @TODO complete new leader tracking
-        position = request.GET.get('p')
-        if position == '1':
+        self.position = request.GET.get('p', 0)
+        if self.position == '1':
             self.is_leader = True
 
         # Convert non-serializable values to strings:
@@ -257,6 +258,41 @@ class FooterRequest(View):
         }
 
 
+    def write_image(self, content, filetype, name=None):
+        """
+        Quick method of writing an image response to a file.
+        This should be asynchronus.
+        This should attach something to the FooterRequest instance.
+        This should use Django media upload methods (MEDIA_DIR, etc)
+        """
+
+        dirname = '/tmp' #@TODO configure MEDIA_DIR
+
+        timestamp = self.timestamp(
+            as_dt=True).isoformat().replace(':', '_')
+
+        fname_parts = [
+            'request',
+            self.footer.id,
+            self.position,
+            name,
+            'LEADER' if self.is_leader else '',
+            timestamp,
+        ]
+
+        fname = "%s/%s.%s" %  (
+            dirname,
+            '-'.join([unicode(p) for p in fname_parts if p]),
+            filetype,
+        )
+
+        print("Writing file: %s" % fname)
+        with open(fname, 'w') as f:
+            f.write(content)
+
+        return fname
+
+
 class FooterEmailInstance(FooterRequest, TemplateView):
     template_name = 'html_preview.html'
 
@@ -294,6 +330,8 @@ class InlineTextImage(FooterRequest):
 	        #log.error(e)
 	        value = u"Unavailable (%s)" % e
         svg = images.inline_text_image(value, resp, styles=self.styles())
+
+        # self.write_image(resp.content, 'png', name=param)
         
         return resp
 
@@ -314,6 +352,8 @@ class InlineTextAnimation(FooterRequest):
 	        value_list = ["Unavailable", e]
 
         images.inline_text_animation(value_list, resp, styles=self.styles())
+
+        # self.write_image(resp.content, 'gif', name=param)
         
         return resp
 
@@ -343,6 +383,8 @@ class LeaderImageView(FooterRequest):
             text = "[LEADER FAILED!]"
         svg = images.inline_text_image(text, resp, styles=self.styles())
         
+        # self.write_image(resp.content, 'gif')
+
         return resp
 
 
@@ -592,3 +634,19 @@ class TestImageView(View):
 
 #
 #
+
+class DashboardView(TemplateView):
+    template_name = "dashboard.html"
+
+    def get_context_data(self):
+
+        footer_requests = models.FooterRequest.objects.all()
+        
+        pattern = '.png|.gif' 
+        #images = [f for f in os.listdir('/tmp') if re.search(pattern, f)]
+        images = sorted(os.listdir('/tmp'))
+        context = {
+            'footer_requests': footer_requests,
+            'images': images,
+        }
+        return context
